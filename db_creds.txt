@@ -1,0 +1,3 @@
+username: admin
+email: lcirne93@gmail.com
+password: cs3050
