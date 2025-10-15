@@ -13,7 +13,7 @@ class FlightSerializer(serializers.ModelSerializer):
             'hl',
             'type',
             'outbound_date',
-            'return_data',
+            'return_date',
             'travel_class',
             'exclude_basic',
             'deep_search',
