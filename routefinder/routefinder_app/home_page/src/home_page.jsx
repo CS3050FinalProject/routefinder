@@ -3,7 +3,7 @@ import React, { useState } from "react";
 export default function AirportRoutes() {
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
-  const [routes, setRoutes] = useState([]);``
+  const [routes, setRoutes] = useState([]);
 
   // Dummy data for now
   const dummyRoutes = [
