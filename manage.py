@@ -1,12 +1,17 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
 
 
+
 def main():
     """Run administrative tasks."""
+<<<<<<<< HEAD:manage.py
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "routefinder.settings")
+========
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "rfhome.settings")
+>>>>>>>> 715c257102ec6a24c4f91aa3b4e3ea6f13cda936:backend/manage.py
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
@@ -18,5 +23,5 @@ def main():
     execute_from_command_line(sys.argv)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
