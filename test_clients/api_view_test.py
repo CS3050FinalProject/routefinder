@@ -32,6 +32,6 @@ def get_test(endpoint):
 
 
 if __name__ == "__main__":
-    endpoint = "http://django-api-env.eba-q3jh5v2m.us-east-1.elasticbeanstalk.com/api/flights/search/"
-    post_test(endpoint)
+    endpoint = "http://django-api-env.eba-q3jh5v2m.us-east-1.elasticbeanstalk.com/api/"
+    #post_test(endpoint)
     get_test(endpoint)
