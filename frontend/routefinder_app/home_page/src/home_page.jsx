@@ -1,4 +1,8 @@
 import React, { useState } from "react";
+import { ReactComponent as Arrow } from './images/arrow.svg';
+
+
+import './index.css'
 
 export default function AirportRoutes() {
   const [origin, setOrigin] = useState("");
@@ -11,6 +15,10 @@ export default function AirportRoutes() {
     { id: 2, route: "Flight 202: Layover in ORD" },
     { id: 3, route: "Flight 303: Layover in DFW" },
   ];
+
+const MyComponent = () => (
+  <Arrow width="50%" height="50%" />
+);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -25,7 +33,7 @@ export default function AirportRoutes() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 text-gray-800 p-4">
       <h1 className="text-3xl font-bold mb-4">Airport Route Finder</h1>
-      
+
       <form onSubmit={handleSubmit} className="flex flex-col gap-3 bg-white p-6 rounded-2xl shadow-lg">
         <input
           type="text"
@@ -34,6 +42,7 @@ export default function AirportRoutes() {
           onChange={(e) => setOrigin(e.target.value)}
           className="border rounded-lg p-2 w-64"
         />
+        <MyComponent></MyComponent>
         <input
           type="text"
           placeholder="Destination Airport (e.g. LAX)"
