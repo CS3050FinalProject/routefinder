@@ -6,8 +6,6 @@ def post_test(endpoint):
     print("POST TEST")
     print("*"*30)
     get_response = requests.post(endpoint, json={
-                                    "engine": "google_flights",
-                                    "api_key": "placeholder",
                                     "departure_id": "SFO",
                                     "arrival_id": "SEA",
                                     "gl": "us",
@@ -34,6 +32,6 @@ def get_test(endpoint):
 
 
 if __name__ == "__main__":
-    endpoint = "http://127.0.0.1:8000/api/"
-    post_test(endpoint)
+    endpoint = "http://django-api-env.eba-q3jh5v2m.us-east-1.elasticbeanstalk.com/api/"
+    #post_test(endpoint)
     get_test(endpoint)
