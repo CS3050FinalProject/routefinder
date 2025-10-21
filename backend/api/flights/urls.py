@@ -1,6 +1,6 @@
 from django.urls import path
-from . import views
+from .views import FlightSearchView
 
 urlpatterns = [
-    path('', views.FlightDetailAPIView.as_view())
+    path('search/', FlightSearchView.as_view(), name='flight-search'),
 ]

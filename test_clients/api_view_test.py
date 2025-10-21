@@ -6,8 +6,6 @@ def post_test(endpoint):
     print("POST TEST")
     print("*"*30)
     get_response = requests.post(endpoint, json={
-                                    "engine": "google_flights",
-                                    "api_key": "placeholder",
                                     "departure_id": "SFO",
                                     "arrival_id": "SEA",
                                     "gl": "us",
