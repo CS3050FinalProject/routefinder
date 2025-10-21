@@ -1,1 +1,1 @@
-web: gunicorn rfhome.wsgi:application --bind 0.0.0.0:$PORT
+web: /var/app/venv/staging-LQM1lest/bin/gunicorn rfhome.wsgi:application --bind 0.0.0.0:8000
