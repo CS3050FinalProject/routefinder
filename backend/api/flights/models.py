@@ -2,9 +2,6 @@ from django.db import models
 
 # Create your models here.
 class Flight(models.Model):
-    # SerpAPI fields
-    engine = models.CharField(max_length=14, default="google_flights")
-    api_key = models.TextField("placeholder")
     # Google Flights API fields
     departure_id = models.CharField(max_length=3)
     arrival_id = models.CharField(max_length=3)
