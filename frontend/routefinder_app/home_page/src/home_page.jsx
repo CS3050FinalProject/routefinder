@@ -16,9 +16,7 @@ export default function AirportRoutes() {
     { id: 3, route: "Flight 303: Layover in DFW" },
   ];
 
-const MyComponent = () => (
-  <Arrow width="50%" height="50%" />
-);
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -40,15 +38,15 @@ const MyComponent = () => (
           placeholder="Origin Airport (e.g. JFK)"
           value={origin}
           onChange={(e) => setOrigin(e.target.value)}
-          className="border rounded-lg p-2 w-64"
+          className="origin_airport border rounded-lg p-2 w-64"
         />
-        <MyComponent></MyComponent>
+        <Arrow className={"arrow"}/>
         <input
           type="text"
           placeholder="Destination Airport (e.g. LAX)"
           value={destination}
           onChange={(e) => setDestination(e.target.value)}
-          className="border rounded-lg p-2 w-64"
+          className="destination_airport border rounded-lg p-2 w-64"
         />
         <button
           type="submit"
