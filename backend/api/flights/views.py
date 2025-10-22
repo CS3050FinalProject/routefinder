@@ -11,7 +11,9 @@ from rest_framework import status
 class FlightDetailAPIView(generics.RetrieveAPIView):
     #queryset = Flight.objects.all()
     #serializer_class = FlightSerializer
-    # lookup_field = 'pk'
+    departure_id = did
+    arrival_id = aid
+    Flights.objects.get(departure_id=did, arrival_id=aid)
     # Products.objects.get(pk=1)
     print("FlightDetailAPIView")
 
