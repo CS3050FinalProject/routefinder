@@ -8,6 +8,10 @@ from django.db import connections
 from django.db.utils import OperationalError
 
 
+def landing(requests):
+    return Response("status": "working")
+
+
 @api_view(["GET", "POST"])
 def api_home(request, *args, **kwargs):
     if request.method == "POST":
@@ -34,3 +38,5 @@ def db_health_check(request):
         return Response({"database_status": "connected"})
     except OperationalError as e:
         return Response({"database_status": "unavailable", "error": str(e)})
+
+
