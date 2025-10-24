@@ -9,7 +9,7 @@ from django.db.utils import OperationalError
 
 
 def landing(requests):
-    return Response("status": "working")
+    return Response({"status": "working"})
 
 
 @api_view(["GET", "POST"])
