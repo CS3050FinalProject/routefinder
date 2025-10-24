@@ -1,4 +1,5 @@
 import json
+from django.http import HttpResponse
 from django.forms.models import model_to_dict
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -9,7 +10,7 @@ from django.db.utils import OperationalError
 
 
 def landing(requests):
-    return Response({"status": "working"})
+    return HttpResponse("API available", status=200)
 
 
 @api_view(["GET", "POST"])
