@@ -6,23 +6,24 @@ def get_test(endpoint):
     print("FLIGHTS SEARCH GET TEST")
     print("*"*30)
     get_response = requests.get(endpoint, params={
-        "departure_id": "SFO",
-        "arrival_id": "SEA",
-        "gl": "us",
+        "departure_id": "PEK",
+        "arrival_id": "AUS",
+        #"gl": "us",
         "hl": "en",
-        "type": 1,
-        "outbound_date": "2025-11-25",
-        "return_date": "2025-11-29",
-        "travel_class": 1,
-        "exclude_basic": False,
-        "deep_search": True
+        #"type": 1,
+        "outbound_date": "2025-11-10",
+        "return_date": "2025-11-16",
+        #"travel_class": 1,
+        #"exclude_basic": False,
+        "currency": "USD",
+        #"deep_search": False
     })
     print(get_response.json())
     print("")
 
 
 if __name__ == "__main__":
-    endpoint = "https://RouteFinder-API-env.eba-n6gmguhe.us-east-1.elasticbeanstalk.com/flights/search/"
+    endpoint = "http://RouteFinder-API-env.eba-n6gmguhe.us-east-1.elasticbeanstalk.com/flights/search/"
     #post_test(endpoint)
     get_test(endpoint)
 
