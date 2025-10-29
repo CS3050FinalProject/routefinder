@@ -80,11 +80,12 @@ WSGI_APPLICATION = 'rfhome.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('RDS_DB_NAME'),
-        'USER': os.environ.get('RDS_USERNAME'),
+        'NAME': os.environ.get('RDS_NAME'),
+        'USER': os.environ.get('RDS_USER'),
         'PASSWORD': os.environ.get('RDS_PASSWORD'),
-        'HOST': 'routefinder-db.c6lmku68y4of.us-east-1.rds.amazonaws.com',
-        'PORT': os.environ.get('RDS_PORT', '5432'),    }
+        'HOST': os.environ.get('RDS_HOSTNAME'),
+        'PORT': os.environ.get('RDS_PORT', '5432'),
+    }
 }
 
 # Use until DJango DB is configured
