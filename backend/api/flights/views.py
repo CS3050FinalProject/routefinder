@@ -52,7 +52,8 @@ class FlightSearchView(APIView):
 
         # forward status code and JSON (or text if non-JSON)
         try:
-            data = r.json()
+            #data = r.json()
+            serializer = FlightSerializer(data=r.data)
             return Response(data, status=r.status_code)
         except ValueError:
             return Response({"error": "SerpAPI returned non-JSON", "text": r.text[:200]}, status=status.HTTP_502_BAD_GATEWAY)
