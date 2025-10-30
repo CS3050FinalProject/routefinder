@@ -23,9 +23,9 @@ class FlightSearchView(APIView):
     }
 
     def get(self, request, format=None):
-        api_key = os.environ.get("SERPAPI_API_KEY") # the api key is in the elastic beanstalk
+        api_key = os.environ.get("SERP_API_KEY") # the api key is in the elastic beanstalk
         if not api_key:
-            return Response({"error": "SERPAPI_API_KEY not configured"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": "SERP_API_KEY not configured"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # copy permitted query params
         params = {}
