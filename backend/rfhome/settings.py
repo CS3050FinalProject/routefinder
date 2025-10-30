@@ -79,22 +79,12 @@ WSGI_APPLICATION = 'rfhome.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.postgresql',
-#        'NAME': os.environ.get('RDS_NAME'),
-#        'USER': os.environ.get('RDS_USER'),
-#        'PASSWORD': os.environ.get('RDS_PASSWORD'),
-#        'HOST': os.environ.get('RDS_HOSTNAME'),
-#        'PORT': os.environ.get('RDS_PORT', '5432'),
-#    }
-#}
-
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL', 'postgresql://postgres:64RedBricks@db.mxycjrawnyryshuxivdy.supabase.co:5432/postgres')
-    )
-}
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL', 'postgresql://postgres:64RedBricks@db.mxycjrawnyryshuxivdy.supabase.co:5432/postgres'),
+            conn_max_age=600
+        )
+    }
 
 # Use until DJango DB is configured
 #DATABASES = {

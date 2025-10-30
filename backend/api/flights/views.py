@@ -8,15 +8,6 @@ from rest_framework.response import Response
 from rest_framework import status
 
 
-class FlightDetailAPIView(generics.RetrieveAPIView):
-    #queryset = Flight.objects.all()
-    #serializer_class = FlightSerializer
-    #departure_id = did
-    #arrival_id = aid
-    #Flights.objects.get(departure_id=did, arrival_id=aid)
-    # Products.objects.get(pk=1)
-    print("FlightDetailAPIView")
-
 class FlightSearchView(APIView):
     """
     Proxy GET requests to SerpAPI (google_flights).

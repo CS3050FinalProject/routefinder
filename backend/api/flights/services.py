@@ -1,11 +1,10 @@
 import json
-from typing import Any, Dict, List, Optional
 from django.db import transaction
 from rest_framework.exceptions import ValidationError
 from .models import Flight
 from .serializers import FlightSerializer
 
-def save_flights(data: Any, batch_size: int=10) -> dict:
+def save_flights(data, batch_size: int=10) -> dict:
     if isinstance(data, str):
         data = json.loads(data)
     if not isinstance(data, list):
