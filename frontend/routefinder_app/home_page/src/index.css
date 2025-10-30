@@ -26,7 +26,7 @@ form {
   margin: 10px 10px;
   justify-content: center;
   align-items: center;
-  width: 100%
+  min-width: 50%
 }
 
 .arrow {
@@ -47,9 +47,35 @@ input[type=text]{
   border-radius: 100px;
   box-sizing: border-box;
 }
-.destination_airport{
-  margin-left: 0px !important;
+/* the group of routes*/
+.routes{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2%;
 }
-.origin_airport{
-  margin-right: 0px !important;
+/* The specific route or trip option*/
+.route{
+  margin: 2em 1em;
+  display: flex;
+  flex-direction: row;
+  border: 2px solid black;
+  align-content: center;
+  border-radius: 5px;
+  justify-content: space-evenly;
+  opacity: 0;
+  transform: translateY(2%);
+  transition: opacity 400ms ease, transform 400ms ease;
+
 }
+.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.companyName{
+  display:flex;
+  align-items: center
+}
+
+
