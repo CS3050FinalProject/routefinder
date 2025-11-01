@@ -1,3 +1,4 @@
+from asyncio.log import logger
 from rest_framework import generics
 from .models import Flight
 #from .serializers import FlightSerializer
@@ -22,9 +23,9 @@ class FlightSearchView(APIView):
     }
 
     def get(self, request, format=None):
-        api_key = os.environ.get("SERPAPI_API_KEY")
+        api_key = os.environ.get("SERP_API_KEY") # the api key is in the elastic beanstalk
         if not api_key:
-            return Response({"error": "SERPAPI_API_KEY not configured"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": "SERP_API_KEY not configured"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # copy permitted query params
         params = {}
@@ -38,13 +39,19 @@ class FlightSearchView(APIView):
 
         try:
             r = requests.get(self.SERPAPI_URL, params=params, timeout=15)
-        except requests.RequestException as e:
-            return Response({"error": "SerpAPI request failed", "detail": str(e)}, status=status.HTTP_502_BAD_GATEWAY)
+            r.raise_for_status()
+        except requests.RequestException as exc:
+            logger.exception("SerpAPI request failed")
+            return Response({"error": "SerpAPI request failed", "detail": str(exc)}, status=status.HTTP_502_BAD_GATEWAY)
 
         # forward status code and JSON (or text if non-JSON)
         try:
-            #data = r.json()
-            serializer = FlightSerializer(data=r.data)
-            return Response(data, status=r.status_code)
+            data = r.json()
+            serializer = FlightSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=r.status_code)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except ValueError:
             return Response({"error": "SerpAPI returned non-JSON", "text": r.text[:200]}, status=status.HTTP_502_BAD_GATEWAY)
