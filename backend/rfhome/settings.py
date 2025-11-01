@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'api',
     'rest_framework',
     'api.flights',
+    'api.searches',
 ]
 
 MIDDLEWARE = [
@@ -81,7 +82,7 @@ WSGI_APPLICATION = 'rfhome.wsgi.application'
 
 DATABASES = {
         'default': dj_database_url.config(
-            default=os.environ.get('DATABASE_URL', 'postgresql://postgres:64RedBricks@db.mxycjrawnyryshuxivdy.supabase.co:5432/postgres')
+            default=os.environ.get('SUPABASE_URL', '')
         )
     }
 
