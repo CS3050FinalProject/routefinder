@@ -23,7 +23,7 @@ def get_test(endpoint):
 
 
 if __name__ == "__main__":
-    endpoint = "http://routefinder-api-rest-env.eba-sgpyhteq.us-east-1.elasticbeanstalk.com/flights/search/"
+    endpoint = "<url>/flights/search/"
     #post_test(endpoint)
     get_test(endpoint)
 
