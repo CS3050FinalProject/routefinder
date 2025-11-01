@@ -5,8 +5,7 @@ class FlightSerializer(serializers.ModelSerializer):
     class Meta:
         model = Flight
         fields = [
-            'engine',
-            'api_key',
+            'search_id',
             'departure_id',
             'arrival_id',
             'gl',
