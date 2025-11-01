@@ -79,19 +79,19 @@ WSGI_APPLICATION = 'rfhome.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-#DATABASES = {
-#        'default': dj_database_url.config(
-#            default=os.environ.get('DATABASE_URL', 'postgresql://postgres:64RedBricks@db.mxycjrawnyryshuxivdy.supabase.co:5432/postgres')
-#        )
-#    }
+DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL', 'postgresql://postgres:64RedBricks@db.mxycjrawnyryshuxivdy.supabase.co:5432/postgres')
+        )
+    }
 
 # Use until DJango DB is configured
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': BASE_DIR / 'db.sqlite3',
+#    }
+#}
 
 
 # Password validation
