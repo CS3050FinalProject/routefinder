@@ -1,6 +1,9 @@
 from asyncio.log import logger
 from backend.api.flights.services import generate_unique_search_id
 from rest_framework import generics
+from .serializers import FlightSerializer
+from ..searches.serializers import SearchSerializer
+from ..searches.models import Search
 from .models import Flight
 #from .serializers import FlightSerializer
 import os
@@ -8,6 +11,7 @@ import requests
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+import datetime
 
 
 class FlightSearchView(APIView):
@@ -45,21 +49,29 @@ class FlightSearchView(APIView):
         params["engine"] = "google_flights"
         params["api_key"] = api_key
 
-        try:
-            r = requests.get(self.SERPAPI_URL, params=params, timeout=15)
-            r.raise_for_status()
-        except requests.RequestException as exc:
-            logger.exception("SerpAPI request failed")
-            return Response({"error": "SerpAPI request failed", "detail": str(exc)}, status=status.HTTP_502_BAD_GATEWAY)
+        # Search Database for existing searches
+        existing_search = Search.objects.filter(search_id=search_id).first()
+        if existing_search:
+            # If found, return existing search data
+            return Response({"message": "Search already exists", "search_id": search_id}, status=status.HTTP_200_OK)
+        else:
+            # If not found, create a new Search entry
+            search_serializer = SearchSerializer.save_search({"search_id": search_id, "search_datetime": datetime.datetime.now()})
+
+        # make request to SerpAPI if not existing search
+        if not existing_search:
+            try:
+                r = requests.get(self.SERPAPI_URL, params=params, timeout=15)
+                r.raise_for_status()
+            except requests.RequestException as exc:
+                logger.exception("SerpAPI request failed")
+                return Response({"error": "SerpAPI request failed", "detail": str(exc)}, status=status.HTTP_502_BAD_GATEWAY)
 
         # forward status code and JSON (or text if non-JSON)
-        try:
-            data = r.json()
-            serializer = FlightSerializer(data=data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=r.status_code)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except ValueError:
-            return Response({"error": "SerpAPI returned non-JSON", "text": r.text[:200]}, status=status.HTTP_502_BAD_GATEWAY)
+            try:
+                data = r.json()
+                flight_objects = FlightSerializer.save_flights(data=data)
+                return Response(flight_objects["created_objs"])
+
+            except ValueError:
+                return Response({"error": "SerpAPI returned non-JSON", "text": r.text[:200]}, status=status.HTTP_502_BAD_GATEWAY)
