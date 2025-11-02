@@ -18,15 +18,16 @@ def get_test(endpoint):
         "currency": "USD",
         #"deep_search": False
     })
-    print(get_response.json())
-    print("")
+    #print(get_response.json())
+    #print("")
     print(get_response.status_code)
     print(get_response.text)
 
 
 if __name__ == "__main__":
     #endpoint = "http://routefinder.us-east-1.elasticbeanstalk.com/flights/search/"
-    endpoint = 'http://127.0.0.1:8000/flights/search'
+    #endpoint = 'http://127.0.0.1:8000/flights/search'
+    endpoint = 'http://0.0.0.0:8000/flights/search'
     #post_test(endpoint)
     get_test(endpoint)
 
