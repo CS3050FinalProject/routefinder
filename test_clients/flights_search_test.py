@@ -1,37 +1,31 @@
 import requests
-
-def post_test(endpoint):
-    print("*"*30)
-    print("POST TEST")
-    print("*"*30)
-    get_response = requests.post(endpoint, json={
-                                    "departure_id": "SFO",
-                                    "arrival_id": "SEA",
-                                    "gl": "us",
-                                    "hl": "en",
-                                    "type": 1,
-                                    "outbound_date": "2025-10-25T09:30:00Z",
-                                    "return_date": "2025-10-30T14:45:00Z",
-                                    "travel_class": 1,
-                                    "exclude_basic": False,
-                                    "deep_search": True
-                                    })
-
-    print(get_response.json())
-    print("")
+import json
 
 
 def get_test(endpoint):
     print("*"*30)
-    print("GET TEST")
+    print("FLIGHTS SEARCH GET TEST")
     print("*"*30)
-    get_response = requests.get(endpoint)
-    print(get_response.json())
-    print("")
+    get_response = requests.get(endpoint, params={
+        "departure_id": "PEK",
+        "arrival_id": "AUS",
+        #"gl": "us",
+        "hl": "en",
+        #"type": 1,
+        "outbound_date": "2025-11-10",
+        "return_date": "2025-11-14",
+        #"travel_class": 1,
+        #"exclude_basic": False,
+        "currency": "USD",
+        #"deep_search": False
+    })
+    data = get_response.json()
+    print(json.dumps(data, indent=2))
 
 
 if __name__ == "__main__":
-    endpoint = "http://django-api-env.eba-q3jh5v2m.us-east-1.elasticbeanstalk.com/api/flights/search/"
+    #endpoint = "http://routefinder.us-east-1.elasticbeanstalk.com/flights/search/"
+    endpoint = 'http://127.0.0.1:8000/flights/search'
     #post_test(endpoint)
     get_test(endpoint)
 
