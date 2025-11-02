@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 class Flight(models.Model):
     # Google Flights API fields
-    search_id = models.TextField(null=False)
+    search_id = models.TextField(null=False, default='noid')
     departure_id = models.CharField(max_length=3)
     arrival_id = models.CharField(max_length=3)
     gl = models.CharField(max_length=2)
