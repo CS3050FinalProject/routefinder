@@ -1,5 +1,5 @@
 from asyncio.log import logger
-from backend.api.flights.services import generate_unique_search_id
+from .services import generate_unique_search_id
 from rest_framework import generics
 from .serializers import FlightSerializer
 from ..searches.serializers import SearchSerializer
