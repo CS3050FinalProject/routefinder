@@ -70,8 +70,22 @@ class FlightSearchView(APIView):
         # forward status code and JSON (or text if non-JSON)
             try:
                 data = r.json()
-                flight_objects = FlightSerializer.save_flights(data=data)
-                return Response(flight_objects["created_objs"])
+                all_flights = [flight for group in data['best_flights'] + data['other_flights'] for flight in group['flights']]
+                all_flights_serializable = []
+                for flight in all_flights:
+                    flight_dict = {
+                        "search_id": search_id,  # or set to some value you have
+                        "departure_id": flight['departure_airport']['id'],
+                        "arrival_id": flight['arrival_airport']['id'],
+                        "type": flight.get('travel_class'),
+                        "outbound_date": flight['departure_airport']['time'],
+                        "travel_class": flight.get('travel_class'),
+                    }
+                    all_flights_serializable.append(flight_dict)
+
+                print(all_flights_serializable)
+                flight_objects = FlightSerializer.save_flights(data=all_flights_serializable)
+                return Response(all_flights_serializable)
 
             except ValueError:
                 return Response({"error": "SerpAPI returned non-JSON", "text": r.text[:200]}, status=status.HTTP_502_BAD_GATEWAY)

@@ -10,14 +10,9 @@ class FlightSerializer(serializers.ModelSerializer):
             'search_id',
             'departure_id',
             'arrival_id',
-            'gl',
-            'hl',
             'type',
             'outbound_date',
-            'return_date',
             'travel_class',
-            'exclude_basic',
-            'deep_search',
         ]
 
     @staticmethod
@@ -27,6 +22,7 @@ class FlightSerializer(serializers.ModelSerializer):
         """
         if isinstance(data, str):
             data = json.loads(data)
+            print("From flights/serializers: Data is str")
         if not isinstance(data, list):
             raise ValueError("Expected a list of flight objects")
 
@@ -36,6 +32,7 @@ class FlightSerializer(serializers.ModelSerializer):
 
         # Unpack the serialized data into a list of Flight objects
         flights = [Flight(**item) for item in validated]
+        print("Form flights/serializer: flights list of models created")
 
         # Atomically add objects to postgres
         with transaction.atomic():
