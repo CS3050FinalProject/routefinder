@@ -1,9 +1,16 @@
-from rest_framework import serializers
-from .models import Flight
-from django.db import transaction
+'''
+Flight serializers.
+'''
 import json
+from rest_framework import serializers
+from django.db import transaction
+from .models import Flight
+
 
 class FlightSerializer(serializers.ModelSerializer):
+    '''
+    Serializer for Flight model.
+    '''
     class Meta:
         model = Flight
         fields = [
