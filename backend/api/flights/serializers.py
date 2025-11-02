@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import Flight
+from django.db import transaction
+import json
 
 class FlightSerializer(serializers.ModelSerializer):
     class Meta:
@@ -18,7 +20,7 @@ class FlightSerializer(serializers.ModelSerializer):
             'deep_search',
         ]
 
-
+    @staticmethod
     def save_flights(data, batch_size: int=10) -> dict:
         """
         Saves a list of flight objects in json or python dictionary format.
@@ -33,7 +35,7 @@ class FlightSerializer(serializers.ModelSerializer):
         validated = serializer.validated_data # store the validated data in a variable
 
         # Unpack the serialized data into a list of Flight objects
-        flights = [Flight(**item) for item in data]
+        flights = [Flight(**item) for item in validated]
 
         # Atomically add objects to postgres
         with transaction.atomic():
