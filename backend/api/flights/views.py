@@ -5,6 +5,7 @@ from .serializers import FlightSerializer
 from ..searches.serializers import SearchSerializer
 from ..searches.models import Search
 from .models import Flight
+from django.http import JsonResponse
 #from .serializers import FlightSerializer
 import os
 import requests
@@ -85,7 +86,7 @@ class FlightSearchView(APIView):
 
                 print(all_flights_serializable)
                 flight_objects = FlightSerializer.save_flights(data=all_flights_serializable)
-                return Response(all_flights_serializable)
+                return Response({'flights': all_flights_serializable})
 
             except ValueError:
                 return Response({"error": "SerpAPI returned non-JSON", "text": r.text[:200]}, status=status.HTTP_502_BAD_GATEWAY)
