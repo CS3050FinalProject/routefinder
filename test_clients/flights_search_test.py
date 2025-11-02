@@ -1,4 +1,5 @@
 import requests
+import json
 
 
 def get_test(endpoint):
@@ -12,22 +13,19 @@ def get_test(endpoint):
         "hl": "en",
         #"type": 1,
         "outbound_date": "2025-11-10",
-        "return_date": "2025-11-12",
+        "return_date": "2025-11-14",
         #"travel_class": 1,
         #"exclude_basic": False,
         "currency": "USD",
         #"deep_search": False
     })
-    #print(get_response.json())
-    #print("")
-    print(get_response.status_code)
-    print(get_response.text)
+    data = get_response.json()
+    print(json.dumps(data, indent=2))
 
 
 if __name__ == "__main__":
     #endpoint = "http://routefinder.us-east-1.elasticbeanstalk.com/flights/search/"
-    #endpoint = 'http://127.0.0.1:8000/flights/search'
-    endpoint = 'http://0.0.0.0:8000/flights/search'
+    endpoint = 'http://127.0.0.1:8000/flights/search'
     #post_test(endpoint)
     get_test(endpoint)
 
