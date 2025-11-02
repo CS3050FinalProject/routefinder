@@ -1,37 +1,42 @@
-from asyncio.log import logger
-from .services import generate_unique_search_id
-from rest_framework import generics
-from .serializers import FlightSerializer
-from ..searches.serializers import SearchSerializer
-from ..searches.models import Search
-from .models import Flight
-from django.http import JsonResponse
-#from .serializers import FlightSerializer
+"""
+Flight views.
+"""
 import os
 import requests
+import datetime
+
+from asyncio.log import logger
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-import datetime
 
+from .serializers import FlightSerializer
+from ..searches.serializers import SearchSerializer
+from ..searches.models import Search
+from .services import generate_unique_search_id
 
 class FlightSearchView(APIView):
     """
     Proxy GET requests to SerpAPI (google_flights).
     Example frontend call:
-      GET /api/search/?departure_id=PEK&arrival_id=AUS&outbound_date=2025-10-10&return_date=2025-10-16&currency=USD&hl=en
+      GET /api/search/?departure_id=PEK&arrival_id=AUS&outbound_date=2025-10-10&return_date=2025-10
+      -16&currency=USD&hl=en
     Must set SERPAPI_API_KEY in environment.
     """
     SERPAPI_URL = "https://serpapi.com/search.json"
-    ALLOWED_PARAMS = {
-        "departure_id", "arrival_id", "outbound_date", "return_date",
-        "currency", "gl", "hl", "travel_class", "type", "api_key"
-    }
+    ALLOWED_PARAMS = {"departure_id", "arrival_id", "outbound_date", "return_date", "currency"}
 
-    def get(self, request, format=None):
+    def get(self, request):
+        """
+        Retrieves flight information from serpapi and checks for
+        recent identical searches stored in db. If search exists 
+        in db and was made previously, returns those search results.
+        Otherwise it queries serpapi and returns new search data.
+        """
         api_key = os.environ.get("SERP_API_KEY") # the api key is in the elastic beanstalk
         if not api_key:
-            return Response({"error": "SERP_API_KEY not configured"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": "SERP_API_KEY not configured"},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # copy permitted query params
         params = {}
@@ -54,10 +59,12 @@ class FlightSearchView(APIView):
         existing_search = Search.objects.filter(search_id=search_id).first()
         if existing_search:
             # If found, return existing search data
-            return Response({"message": "Search already exists", "search_id": search_id}, status=status.HTTP_200_OK)
-        else:
-            # If not found, create a new Search entry
-            search_serializer = SearchSerializer.save_search({"search_id": search_id, "search_datetime": datetime.datetime.now()})
+            response = {"message": "Search already exists", "search_id": search_id}
+            return Response(response, status=status.HTTP_200_OK)
+        # If not found, create a new Search entry
+        SearchSerializer.save_search(
+            {"search_id": search_id, "search_datetime": datetime.datetime.now()}
+        )
 
         # make request to SerpAPI if not existing search
         if not existing_search:
@@ -66,12 +73,15 @@ class FlightSearchView(APIView):
                 r.raise_for_status()
             except requests.RequestException as exc:
                 logger.exception("SerpAPI request failed")
-                return Response({"error": "SerpAPI request failed", "detail": str(exc)}, status=status.HTTP_502_BAD_GATEWAY)
+                return Response({"error": "SerpAPI request failed", 
+                                 "detail": str(exc)},
+                                status=status.HTTP_502_BAD_GATEWAY)
 
         # forward status code and JSON (or text if non-JSON)
             try:
                 data = r.json()
-                all_flights = [flight for group in data['best_flights'] + data['other_flights'] for flight in group['flights']]
+                all_flights = [flight for group in data['best_flights'] + 
+                    data['other_flights'] for flight in group['flights']]
                 all_flights_serializable = []
                 for flight in all_flights:
                     flight_dict = {
@@ -85,8 +95,10 @@ class FlightSearchView(APIView):
                     all_flights_serializable.append(flight_dict)
 
                 print(all_flights_serializable)
-                flight_objects = FlightSerializer.save_flights(data=all_flights_serializable)
+                FlightSerializer.save_flights(data=all_flights_serializable)
                 return Response({'flights': all_flights_serializable})
 
             except ValueError:
-                return Response({"error": "SerpAPI returned non-JSON", "text": r.text[:200]}, status=status.HTTP_502_BAD_GATEWAY)
+                return Response({"error": "SerpAPI returned non-JSON", 
+                                 "text": r.text[:200]},
+                                 status=status.HTTP_502_BAD_GATEWAY)

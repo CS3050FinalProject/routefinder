@@ -1,25 +1,32 @@
-import json
+"""
+Generic test views for the api.
+"""
 from django.http import HttpResponse
-from django.forms.models import model_to_dict
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from api.flights.models import Flight
-from api.flights.serializers import FlightSerializer
 from django.db import connections
 from django.db.utils import OperationalError
 
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 
-def landing(requests):
+from api.flights.models import Flight
+from api.flights.serializers import FlightSerializer
+
+def landing():
+    """
+    Home page place holder to keep eb healthy.
+    """
     return HttpResponse("API available", status=200)
 
 
 @api_view(["GET", "POST"])
 def api_home(request, *args, **kwargs):
+    """
+    View to test app connectivity.
+    """
     if request.method == "POST":
         print("Serializing...")
         serializer = FlightSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            print(serializer.data)
             return Response(serializer.data)
 
     elif request.method == "GET":
@@ -29,15 +36,17 @@ def api_home(request, *args, **kwargs):
         return Response(json_data)
 
     else:
-        return Response({"error": "bad request"})
+        response = {"error": "bad request"}
+        return Response(response)
 
 
 def db_health_check(request):
+    """
+    Check that connection to db can be made.
+    """
     db_conn = connections['default']
     try:
         db_conn.cursor()
         return Response({"database_status": "connected"})
     except OperationalError as e:
         return Response({"database_status": "unavailable", "error": str(e)})
-
-

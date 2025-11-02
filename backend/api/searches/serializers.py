@@ -1,8 +1,17 @@
+"""
+Search serializer and save function.
+"""
 from rest_framework import serializers
 from .models import Search
 
 class SearchSerializer(serializers.ModelSerializer):
+    """
+    Search serializer.
+    """
     class Meta:
+        """
+        Model fields.
+        """
         model = Search
         fields = [
             'search_id',
