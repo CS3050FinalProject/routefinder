@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -10,6 +14,16 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+header{
+  position: sticky;
+  top:0;
+  background-color: dimgrey;
+  border: 1px solid dimgrey;
+  border-bottom-left-radius: 23px;
+  border-bottom-right-radius: 23px;
+  z-index: 1;
 }
 
 html {
@@ -55,7 +69,7 @@ input[type=text]{
   gap: 2%;
 }
 /* The specific route or trip option*/
-.route{
+.route {
   margin: 2em 1em;
   display: flex;
   flex-direction: row;
@@ -64,8 +78,8 @@ input[type=text]{
   border-radius: 5px;
   justify-content: space-evenly;
   opacity: 0;
-  transform: translateY(2%);
-  transition: opacity 400ms ease, transform 400ms ease;
+  transform: translateY(80px);
+  transition: opacity 1s ease, transform 1s ease;
 
 }
 .show {
