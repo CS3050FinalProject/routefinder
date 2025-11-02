@@ -1,4 +1,5 @@
 from asyncio.log import logger
+from backend.api.flights.services import generate_unique_search_id
 from rest_framework import generics
 from .models import Flight
 #from .serializers import FlightSerializer
@@ -32,6 +33,13 @@ class FlightSearchView(APIView):
         for k, v in request.query_params.items():
             if k in self.ALLOWED_PARAMS:
                 params[k] = v
+
+
+        # generate unique search ID
+        search_id = generate_unique_search_id(params.get("departure_id", ""),
+                                              params.get("arrival_id", ""),
+                                              params.get("outbound_date", ""),
+                                              params.get("return_date", ""))
 
         # enforce engine and api_key
         params["engine"] = "google_flights"
