@@ -21,7 +21,7 @@ class FlightSerializer(serializers.ModelSerializer):
         ]
 
     @staticmethod
-    def save_flights(data, batch_size: int=10) -> dict:
+    def save_flights(data, batch_size: int=1000) -> dict:
         """
         Saves a list of flight objects in json or python dictionary format.
         """
