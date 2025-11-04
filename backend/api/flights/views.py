@@ -2,10 +2,10 @@
 Flight views.
 """
 import os
-import requests
 import datetime
-
 from asyncio.log import logger
+
+import requests
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -73,7 +73,7 @@ class FlightSearchView(APIView):
                 r.raise_for_status()
             except requests.RequestException as exc:
                 logger.exception("SerpAPI request failed")
-                return Response({"error": "SerpAPI request failed", 
+                return Response({"error": "SerpAPI request failed",
                                  "detail": str(exc)},
                                 status=status.HTTP_502_BAD_GATEWAY)
 
@@ -81,7 +81,7 @@ class FlightSearchView(APIView):
             # TODO: Modify block to parse multi_city_json from serpapi
             try:
                 data = r.json()
-                all_flights = [flight for group in data['best_flights'] + 
+                all_flights = [flight for group in data['best_flights'] +
                     data['other_flights'] for flight in group['flights']]
                 all_flights_serializable = []
                 for flight in all_flights:
@@ -100,6 +100,6 @@ class FlightSearchView(APIView):
                 return Response({'flights': all_flights_serializable})
 
             except ValueError:
-                return Response({"error": "SerpAPI returned non-JSON", 
+                return Response({"error": "SerpAPI returned non-JSON",
                                  "text": r.text[:200]},
                                  status=status.HTTP_502_BAD_GATEWAY)
