@@ -68,7 +68,8 @@ class FlightSearchView(APIView):
                 logger.exception("SerpAPI request failed")
                 return Response({"error": "SerpAPI request failed", "detail": str(exc)}, status=status.HTTP_502_BAD_GATEWAY)
 
-        # forward status code and JSON (or text if non-JSON)
+            # forward status code and JSON (or text if non-JSON)
+            # TODO: modify block to handle lists of flights for mulit_city_json
             try:
                 data = r.json()
                 all_flights = [flight for group in data['best_flights'] + data['other_flights'] for flight in group['flights']]
