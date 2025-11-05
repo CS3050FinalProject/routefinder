@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+from .models import Flight
 from .serializers import FlightSerializer
 from ..searches.serializers import SearchSerializer
 from ..searches.models import Search
@@ -58,9 +59,26 @@ class FlightSearchView(APIView):
         # Search Database for existing searches
         existing_search = Search.objects.filter(search_id=search_id).first()
         if existing_search:
-            # If found, return existing search data
-            response = {"message": "Search already exists", "search_id": search_id}
-            return Response(response, status=status.HTTP_200_OK)
+           # If found, return existing search data (fetch flights from DB)
+            flights_qs = Flight.objects.filter(search=existing_search)
+            if not flights_qs.exists():
+                flights_qs = Flight.objects.filter(search_id=search_id)
+
+            flights_list = []
+            for f in flights_qs:
+                # build a dict similar to how created_flights was constructed
+                    flight_dict = {
+                        "search_id": getattr(f, "search_id", None),
+                        "departure_id": getattr(f, "departure_id", None),
+                        "arrival_id": getattr(f, "arrival_id", None),
+                        "outbound_date": getattr(f, "outbound_date", None),
+                        "travel_class": getattr(f, "travel_class", None),
+                    }
+                    flights_list.append(flight_dict)
+
+            return Response({'flights': flights_list})
+        
+
         # If not found, create a new Search entry
         SearchSerializer.save_search(
             {"search_id": search_id, "search_datetime": datetime.datetime.now()}
@@ -94,7 +112,6 @@ class FlightSearchView(APIView):
                     }
                     all_flights_serializable.append(flight_dict)
 
-                print(all_flights_serializable)
                 FlightSerializer.save_flights(data=all_flights_serializable)
                 return Response({'flights': all_flights_serializable})
 
