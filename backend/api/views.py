@@ -15,6 +15,7 @@ def landing():
     """
     Home page place holder to keep eb healthy.
     """
+    print("Landing request")
     return HttpResponse("API available", status=200)
 
 
