@@ -11,7 +11,7 @@ from rest_framework.decorators import api_view
 from api.flights.models import Flight
 from api.flights.serializers import FlightSerializer
 
-def landing():
+def landing(request):
     """
     Home page place holder to keep eb healthy.
     """
