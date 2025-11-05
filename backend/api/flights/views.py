@@ -95,7 +95,8 @@ class FlightSearchView(APIView):
                                  "detail": str(exc)},
                                 status=status.HTTP_502_BAD_GATEWAY)
 
-        # forward status code and JSON (or text if non-JSON)
+            # forward status code and JSON (or text if non-JSON)
+            # TODO: Modify block to parse multi_city_json from serpapi
             try:
                 data = r.json()
                 all_flights = [flight for group in data['best_flights'] +
