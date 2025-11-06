@@ -18,11 +18,19 @@ class FlightSerializer(serializers.ModelSerializer):
         fields = [
             'flight_id'
             'search_id',
+            'trip_id',
             'departure_id',
+            'departure_airport',
             'arrival_id',
+            'departure_time',
+            'arrival_time',
+            'arrival_airport',
             'type',
+            'price',
+            'duration',
             'outbound_date',
             'travel_class',
+            'airline_logo',
         ]
 
     @staticmethod
