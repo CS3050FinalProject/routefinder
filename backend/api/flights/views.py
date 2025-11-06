@@ -107,7 +107,7 @@ class FlightSearchView(APIView):
                         "search_id": search_id,  # or set to some value you have
                         "departure_id": flight['departure_airport']['id'],
                         "arrival_id": flight['arrival_airport']['id'],
-                        "type": flight.get('travel_class'),
+                        "type": flight.get('type'),
                         "outbound_date": flight['departure_airport']['time'],
                         "travel_class": flight.get('travel_class'),
                     }
