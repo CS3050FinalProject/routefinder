@@ -15,6 +15,8 @@ class Flight(models.Model):
     trip_id = models.TextField(default='noid')
     departure_id = models.CharField(max_length=3)
     arrival_id = models.CharField(max_length=3)
+    departure_time = models.DateTimeField()
+    arrival_time = models.DateTimeField()
     type = models.CharField(max_length=20)
     price = models.IntegerField(default=0)
     duration = models.IntegerField(default=0)

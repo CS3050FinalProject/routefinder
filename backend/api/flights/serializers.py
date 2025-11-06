@@ -16,9 +16,14 @@ class FlightSerializer(serializers.ModelSerializer):
         fields = [
             'flight_id'
             'search_id',
+            'trip_id',
             'departure_id',
             'arrival_id',
+            'departure_time',
+            'arrival_time',
             'type',
+            'price',
+            'duration',
             'outbound_date',
             'travel_class',
         ]
