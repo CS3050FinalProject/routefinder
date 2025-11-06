@@ -10,6 +10,7 @@ import requests
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.core import serializers
 
 from .models import Flight
 from .serializers import FlightSerializer
@@ -78,14 +79,15 @@ class FlightSearchView(APIView):
                                 status=status.HTTP_502_BAD_GATEWAY)
 
             # forward status code and JSON (or text if non-JSON)
-            # TODO: Modify block to parse multi_city_json from serpapi
             try:
+                print("trying")
                 data = r.json()
                 # Extract list of itineraries (adjust key if SerpAPI response uses a different one)
                 best_flights = data.get("best_flights") or data.get("flights") or []
 
                 flights_to_save = []
                 for itinerary in best_flights:
+                    print(itinerary)
                     # price / meta may be on the itinerary level
                     itinerary_price = itinerary.get("price")
                     airline_logo = itinerary.get("airline_logo")
@@ -112,14 +114,16 @@ class FlightSearchView(APIView):
                             "carrier": flight.get("airline")
                         }
                     flights_to_save.append(flight_dict)
-
+                #print("saving flights checkpoint")
                 FlightSerializer.save_flights(data=flights_to_save)
-                return Response({'flights': flights_to_save})
 
             except ValueError:
+                print("Raising value error")
                 return Response({"error": "SerpAPI returned non-JSON",
                                  "text": r.text[:200]},
                                  status=status.HTTP_502_BAD_GATEWAY)
-            
+        #print("checkpoint")
         get_flights_by_search_id = FlightSerializer.get_flights_by_search_id(search_id)
-        return Response(get_flights_by_search_id)
+        print(type(get_flights_by_search_id))
+        flights = serializers.serialize("json", get_flights_by_search_id)
+        return Response(flights)

@@ -38,6 +38,7 @@ class FlightSerializer(serializers.ModelSerializer):
         """
         Saves a list of flight objects in json or python dictionary format.
         """
+        print("data:", data)
         if isinstance(data, str):
             data = json.loads(data)
             print("From flights/serializers: Data is str")
@@ -50,18 +51,21 @@ class FlightSerializer(serializers.ModelSerializer):
 
         # Unpack the serialized data into a list of Flight objects
         flights = [Flight(**item) for item in validated]
-        print("Form flights/serializer: flights list of models created")
+        print("From flights/serializer: flights list of models created")
 
         # Atomically add objects to postgres
         with transaction.atomic():
             created_objs = Flight.objects.bulk_create(flights, batch_size=batch_size)
 
         return {"created": len(created_objs), "created_objs": created_objs}
-    
+
+
     def get_flights_by_search_id(search_id: str):
         '''Retrieve flights by search_id. Returns a list of flight dicts.'''
         # If found, return existing search data (fetch flights from DB)
-        flights_qs = Flight.objects.filter(search_id=search_id)
+        print(search_id)
+        if Flight.objects.exits():
+            flights_qs = Flight.objects.filter(search_id=search_id)
 
         flights_list = []
         for f in flights_qs:
@@ -75,5 +79,5 @@ class FlightSerializer(serializers.ModelSerializer):
                 }
                 flights_list.append(flight_dict)
 
-        return flights_list
+        return flight_qs
 
