@@ -4,6 +4,7 @@ Flight views.
 import os
 import datetime
 from asyncio.log import logger
+import json
 
 import requests
 from rest_framework.views import APIView
@@ -14,7 +15,7 @@ from .models import Flight
 from .serializers import FlightSerializer
 from ..searches.serializers import SearchSerializer
 from ..searches.models import Search
-from .services import generate_unique_search_id
+from .services import generate_unique_search_id, generate_unique_trip_id
 
 class FlightSearchView(APIView):
     """
@@ -55,37 +56,18 @@ class FlightSearchView(APIView):
         # enforce engine and api_key
         params["engine"] = "google_flights"
         params["api_key"] = api_key
+        params["multi_city_json"] = "true"
 
         # Search Database for existing searches
         existing_search = Search.objects.filter(search_id=search_id).first()
-        if existing_search:
-           # If found, return existing search data (fetch flights from DB)
-            flights_qs = Flight.objects.filter(search=existing_search)
-            if not flights_qs.exists():
-                flights_qs = Flight.objects.filter(search_id=search_id)
-
-            flights_list = []
-            for f in flights_qs:
-                # build a dict similar to how created_flights was constructed
-                    flight_dict = {
-                        "search_id": getattr(f, "search_id", None),
-                        "departure_id": getattr(f, "departure_id", None),
-                        "arrival_id": getattr(f, "arrival_id", None),
-                        "outbound_date": getattr(f, "outbound_date", None),
-                        "travel_class": getattr(f, "travel_class", None),
-                    }
-                    flights_list.append(flight_dict)
-
-            return Response({'flights': flights_list})
-        
-
-        # If not found, create a new Search entry
-        SearchSerializer.save_search(
-            {"search_id": search_id, "search_datetime": datetime.datetime.now()}
-        )
 
         # make request to SerpAPI if not existing search
         if not existing_search:
+            # If not found, create a new Search entry
+            SearchSerializer.save_search(
+                {"search_id": search_id, "search_datetime": datetime.datetime.now()}
+            )
+
             try:
                 r = requests.get(self.SERPAPI_URL, params=params, timeout=15)
                 r.raise_for_status()
@@ -99,24 +81,45 @@ class FlightSearchView(APIView):
             # TODO: Modify block to parse multi_city_json from serpapi
             try:
                 data = r.json()
-                all_flights = [flight for group in data['best_flights'] +
-                    data['other_flights'] for flight in group['flights']]
-                all_flights_serializable = []
-                for flight in all_flights:
-                    flight_dict = {
-                        "search_id": search_id,  # or set to some value you have
-                        "departure_id": flight['departure_airport']['id'],
-                        "arrival_id": flight['arrival_airport']['id'],
-                        "type": flight.get('type'),
-                        "outbound_date": flight['departure_airport']['time'],
-                        "travel_class": flight.get('travel_class'),
-                    }
-                    all_flights_serializable.append(flight_dict)
+                # Extract list of itineraries (adjust key if SerpAPI response uses a different one)
+                best_flights = data.get("best_flights") or data.get("flights") or []
 
-                FlightSerializer.save_flights(data=all_flights_serializable)
-                return Response({'flights': all_flights_serializable})
+                flights_to_save = []
+                for itinerary in best_flights:
+                    # price / meta may be on the itinerary level
+                    itinerary_price = itinerary.get("price")
+                    airline_logo = itinerary.get("airline_logo")
+                    type = itinerary.get("type")
+                    flights = itinerary.get("flights")
+
+                    trip_id = generate_unique_trip_id(json.dumps(flights))
+
+                    for flight in flights:
+
+                        flight_dict = {
+                            "search_id": search_id,
+                            "trip_id": trip_id,
+                            "type": type,
+                            "airline_logo": airline_logo,
+                            "price": itinerary_price,
+                            "departure_id": flight.get("departure_id"),
+                            "departure_airport": flight.get("departure_airport").get("name"),
+                            "arrival_id": flight.get("arrival_id"),
+                            "arrival_airport": flight.get("arrival_airport").get("name"),
+                            "departure_time": flight.get("departure_airport").get("departure_time"),
+                            "arrival_time": flight.get("arrival_airport").get("arrival_time"),
+                            "duration": flight.get("duration"),
+                            "carrier": flight.get("airline")
+                        }
+                    flights_to_save.append(flight_dict)
+
+                FlightSerializer.save_flights(data=flights_to_save)
+                return Response({'flights': flights_to_save})
 
             except ValueError:
                 return Response({"error": "SerpAPI returned non-JSON",
                                  "text": r.text[:200]},
                                  status=status.HTTP_502_BAD_GATEWAY)
+            
+        get_flights_by_search_id = FlightSerializer.get_flights_by_search_id(search_id)
+        return Response(get_flights_by_search_id)

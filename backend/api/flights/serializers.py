@@ -2,6 +2,8 @@
 Flight serializers.
 '''
 import json
+
+from requests import Response
 from rest_framework import serializers
 from django.db import transaction
 from .models import Flight
@@ -47,3 +49,23 @@ class FlightSerializer(serializers.ModelSerializer):
             created_objs = Flight.objects.bulk_create(flights, batch_size=batch_size)
 
         return {"created": len(created_objs), "created_objs": created_objs}
+    
+    def get_flights_by_search_id(search_id: str):
+        '''Retrieve flights by search_id. Returns a list of flight dicts.'''
+        # If found, return existing search data (fetch flights from DB)
+        flights_qs = Flight.objects.filter(search_id=search_id)
+
+        flights_list = []
+        for f in flights_qs:
+            # build a dict similar to how created_flights was constructed
+                flight_dict = {
+                    "search_id": getattr(f, "search_id", None),
+                    "departure_id": getattr(f, "departure_id", None),
+                    "arrival_id": getattr(f, "arrival_id", None),
+                    "outbound_date": getattr(f, "outbound_date", None),
+                    "travel_class": getattr(f, "travel_class", None),
+                }
+                flights_list.append(flight_dict)
+
+        return flights_list
+

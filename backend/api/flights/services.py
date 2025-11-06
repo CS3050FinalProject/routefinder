@@ -32,3 +32,7 @@ def generate_unique_search_id(
     '''Generates a unique search ID based on flight search parameters.'''
     unique_string = f"{departure_id}-{arrival_id}-{outbound_date}-{return_date}"
     return hashlib.md5(unique_string.encode()).hexdigest()
+
+def generate_unique_trip_id(full_trip_str: str) -> str:
+    '''Generates a unique trip ID based on what flights are connected.'''
+    return hashlib.md5(full_trip_str.encode()).hexdigest()
