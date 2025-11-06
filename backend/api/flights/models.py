@@ -22,5 +22,6 @@ class Flight(models.Model):
     type = models.CharField(max_length=20)
     price = models.IntegerField(default=0)
     duration = models.IntegerField(default=0)
-    outbound_date = models.DateTimeField(null=False)
+    outbound_date = models.DateTimeField()
     travel_class = models.CharField(max_length=20, null=True)
+    airline_logo = models.TextField(null=True)

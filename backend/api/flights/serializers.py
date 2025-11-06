@@ -28,6 +28,7 @@ class FlightSerializer(serializers.ModelSerializer):
             'duration',
             'outbound_date',
             'travel_class',
+            'airline_logo',
         ]
 
     @staticmethod
