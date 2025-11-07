@@ -25,3 +25,4 @@ class Flight(models.Model):
     outbound_date = models.DateTimeField()
     travel_class = models.CharField(max_length=20, null=True)
     airline_logo = models.TextField(null=True)
+    airline_name = models.TextField(null=True)

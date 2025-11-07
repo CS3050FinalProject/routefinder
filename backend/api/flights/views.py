@@ -64,14 +64,14 @@ class FlightSearchView(APIView):
 
         # make request to SerpAPI if not existing search
         if not existing_search:
-            # If not found, create a new Search entry
-            SearchSerializer.save_search(
-                {"search_id": search_id, "search_datetime": datetime.datetime.now()}
-            )
-
             try:
                 r = requests.get(self.SERPAPI_URL, params=params, timeout=15)
                 r.raise_for_status()
+                print("SerpAPI request successful")
+                # If not found, create a new Search entry
+                SearchSerializer.save_search(
+                    {"search_id": search_id, "search_datetime": datetime.datetime.now()}
+                )
             except requests.RequestException as exc:
                 logger.exception("SerpAPI request failed")
                 return Response({"error": "SerpAPI request failed",
@@ -87,7 +87,7 @@ class FlightSearchView(APIView):
 
                 flights_to_save = []
                 for itinerary in best_flights:
-                    print(itinerary)
+                    # print(itinerary)
                     # price / meta may be on the itinerary level
                     itinerary_price = itinerary.get("price")
                     airline_logo = itinerary.get("airline_logo")
@@ -99,22 +99,26 @@ class FlightSearchView(APIView):
                     for flight in flights:
 
                         flight_dict = {
-                            "search_id": search_id,
-                            "trip_id": trip_id,
-                            "type": type,
-                            "airline_logo": airline_logo,
-                            "price": itinerary_price,
-                            "departure_id": flight.get("departure_id"),
-                            "departure_airport": flight.get("departure_airport").get("name"),
-                            "arrival_id": flight.get("arrival_id"),
-                            "arrival_airport": flight.get("arrival_airport").get("name"),
-                            "departure_time": flight.get("departure_airport").get("departure_time"),
-                            "arrival_time": flight.get("arrival_airport").get("arrival_time"),
-                            "duration": flight.get("duration"),
-                            "carrier": flight.get("airline")
+                            'search_id': search_id,
+                            'trip_id': trip_id,
+                            'departure_id': flight.get("departure_id"),
+                            'departure_airport': flight.get("departure_airport").get("name"),
+                            'arrival_id': flight.get("arrival_id"),
+                            'departure_time': flight.get("departure_airport").get("departure_time"),
+                            'arrival_time': flight.get("arrival_airport").get("arrival_time"),
+                            'arrival_airport': flight.get("arrival_airport").get("name"),
+                            'type': type,
+                            'price': itinerary_price,
+                            'duration': flight.get("duration"),
+                            'outbound_date': flight.get("outbound_date"),
+                            'travel_class': flight.get("travel_class"),
+                            'airline_logo': airline_logo,
+                            'airline_name': flight.get("airline_name")
                         }
-                    flights_to_save.append(flight_dict)
-                #print("saving flights checkpoint")
+                        print("flight_dict:", flight_dict)
+                        flights_to_save.append(flight_dict)
+                
+                print("saving flights checkpoint")
                 FlightSerializer.save_flights(data=flights_to_save)
 
             except ValueError:

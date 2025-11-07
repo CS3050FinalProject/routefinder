@@ -16,7 +16,6 @@ class FlightSerializer(serializers.ModelSerializer):
     class Meta:
         model = Flight
         fields = [
-            'flight_id'
             'search_id',
             'trip_id',
             'departure_id',
@@ -31,6 +30,7 @@ class FlightSerializer(serializers.ModelSerializer):
             'outbound_date',
             'travel_class',
             'airline_logo',
+            'airline_name',
         ]
 
     @staticmethod
@@ -38,7 +38,7 @@ class FlightSerializer(serializers.ModelSerializer):
         """
         Saves a list of flight objects in json or python dictionary format.
         """
-        print("data:", data)
+        print("Saving flights in serializer")
         if isinstance(data, str):
             data = json.loads(data)
             print("From flights/serializers: Data is str")
@@ -63,7 +63,7 @@ class FlightSerializer(serializers.ModelSerializer):
     def get_flights_by_search_id(search_id: str):
         '''Retrieve flights by search_id. Returns a list of flight dicts.'''
         # If found, return existing search data (fetch flights from DB)
-        print(search_id)
+        print("search_id:", search_id)
         if Flight.objects.exits():
             flights_qs = Flight.objects.filter(search_id=search_id)
 
