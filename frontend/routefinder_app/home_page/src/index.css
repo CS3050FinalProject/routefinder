@@ -17,12 +17,9 @@ code {
 }
 
 header{
-  position: sticky;
+  /*position: sticky;*/
   top:0;
   background-color: dimgrey;
-  border: 1px solid dimgrey;
-  border-bottom-left-radius: 23px;
-  border-bottom-right-radius: 23px;
   z-index: 1;
 }
 
@@ -34,14 +31,6 @@ h1 {
   color: white;
 }
 
-form {
-  display: flex;
-  justify-self: center;
-  margin: 10px 10px;
-  justify-content: center;
-  align-items: center;
-  min-width: 50%
-}
 
 .arrow {
   width: 25%;
@@ -91,5 +80,6 @@ input[type=text]{
   display:flex;
   align-items: center
 }
+
 
 
