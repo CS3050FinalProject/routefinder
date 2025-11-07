@@ -14,8 +14,8 @@ from django.core import serializers
 
 from .models import Flight
 from .serializers import FlightSerializer
-from ..searches.serializers import SearchSerializer
-from ..searches.models import Search
+from api.searches.serializers import SearchSerializer
+from api.searches.models import Search
 from .services import generate_unique_search_id, generate_unique_trip_id
 
 class FlightSearchView(APIView):
@@ -36,6 +36,7 @@ class FlightSearchView(APIView):
         in db and was made previously, returns those search results.
         Otherwise it queries serpapi and returns new search data.
         """
+        print(">>> get request")
         api_key = os.environ.get("SERP_API_KEY") # the api key is in the elastic beanstalk
         if not api_key:
             return Response({"error": "SERP_API_KEY not configured"},
@@ -47,12 +48,12 @@ class FlightSearchView(APIView):
             if k in self.ALLOWED_PARAMS:
                 params[k] = v
 
-
         # generate unique search ID
         search_id = generate_unique_search_id(params.get("departure_id", ""),
                                               params.get("arrival_id", ""),
                                               params.get("outbound_date", ""),
                                               params.get("return_date", ""))
+        print(">>> search_id generated")
 
         # enforce engine and api_key
         params["engine"] = "google_flights"
@@ -60,18 +61,25 @@ class FlightSearchView(APIView):
         params["multi_city_json"] = "true"
 
         # Search Database for existing searches
+        print(">>> Checking for previous matching searches")
         existing_search = Search.objects.filter(search_id=search_id).first()
+        if existing_search:
+            print(">>> Existing search found")
+        else:
+            print(">>> No existing search found")
 
         # make request to SerpAPI if not existing search
         if not existing_search:
             try:
                 r = requests.get(self.SERPAPI_URL, params=params, timeout=15)
                 r.raise_for_status()
-                print("SerpAPI request successful")
+                print(">>> SerpAPI request successful")
                 # If not found, create a new Search entry
+                print(">>> Saving search")
                 SearchSerializer.save_search(
                     {"search_id": search_id, "search_datetime": datetime.datetime.now()}
                 )
+                print(">>> Search saved")
             except requests.RequestException as exc:
                 logger.exception("SerpAPI request failed")
                 return Response({"error": "SerpAPI request failed",
@@ -80,7 +88,7 @@ class FlightSearchView(APIView):
 
             # forward status code and JSON (or text if non-JSON)
             try:
-                print("trying")
+                print(">>> Parsing SERP query json")
                 data = r.json()
                 # Extract list of itineraries (adjust key if SerpAPI response uses a different one)
                 best_flights = data.get("best_flights") or data.get("flights") or []
@@ -93,11 +101,9 @@ class FlightSearchView(APIView):
                     airline_logo = itinerary.get("airline_logo")
                     type = itinerary.get("type")
                     flights = itinerary.get("flights")
-
                     trip_id = generate_unique_trip_id(json.dumps(flights))
 
                     for flight in flights:
-
                         flight_dict = {
                             'search_id': search_id,
                             'trip_id': trip_id,
@@ -115,11 +121,12 @@ class FlightSearchView(APIView):
                             'airline_logo': airline_logo,
                             'airline_name': flight.get("airline_name")
                         }
-                        print("flight_dict:", flight_dict)
+                        #print(">>> flight_dict:", flight_dict)
                         flights_to_save.append(flight_dict)
                 
-                print("saving flights checkpoint")
+                print(">>> Saving flights")
                 FlightSerializer.save_flights(data=flights_to_save)
+                print(">>> Flights saved")
 
             except ValueError:
                 print("Raising value error")
@@ -127,7 +134,8 @@ class FlightSearchView(APIView):
                                  "text": r.text[:200]},
                                  status=status.HTTP_502_BAD_GATEWAY)
         #print("checkpoint")
+        print(">>> Getting flights by search_id")
         get_flights_by_search_id = FlightSerializer.get_flights_by_search_id(search_id)
-        print(type(get_flights_by_search_id))
+        print(">>> Flights found")
         flights = serializers.serialize("json", get_flights_by_search_id)
         return Response(flights)

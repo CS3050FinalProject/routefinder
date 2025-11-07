@@ -38,20 +38,25 @@ class FlightSerializer(serializers.ModelSerializer):
         """
         Saves a list of flight objects in json or python dictionary format.
         """
-        print("Saving flights in serializer")
+        print("--- Checking data type")
         if isinstance(data, str):
             data = json.loads(data)
-            print("From flights/serializers: Data is str")
+            print("--- Data is str")
         if not isinstance(data, list):
-            raise ValueError("Expected a list of flight objects")
+            raise ValueError("--- Expected a list of flight objects")
 
+        print("--- Serializing flights")
         serializer = FlightSerializer(data=data, many=True) # pass data to serializer
+        print("--- Flights serialized")
+        print("--- Checking flights validity")
         serializer.is_valid(raise_exception=True) # check data validity
         validated = serializer.validated_data # store the validated data in a variable
+        print("--- Data is valid")
 
         # Unpack the serialized data into a list of Flight objects
+        print("--- Saving flights as models")
         flights = [Flight(**item) for item in validated]
-        print("From flights/serializer: flights list of models created")
+        print("--- Flight models created")
 
         # Atomically add objects to postgres
         with transaction.atomic():
@@ -63,9 +68,10 @@ class FlightSerializer(serializers.ModelSerializer):
     def get_flights_by_search_id(search_id: str):
         '''Retrieve flights by search_id. Returns a list of flight dicts.'''
         # If found, return existing search data (fetch flights from DB)
-        print("search_id:", search_id)
+        print("--- Checking if flight objects exist")
         if Flight.objects.exits():
             flights_qs = Flight.objects.filter(search_id=search_id)
+            print("--- Flights found:", flights_qs)
 
         flights_list = []
         for f in flights_qs:
