@@ -41,6 +41,7 @@ class FlightSearchView(APIView):
         if not api_key:
             return Response({"error": "SERP_API_KEY not configured"},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        print("WARNING: IS YOUR SUPABASE URL KEY CONFIGURED FOR LOCAL ENVIRONMENT?")
 
         # copy permitted query params
         params = {}
