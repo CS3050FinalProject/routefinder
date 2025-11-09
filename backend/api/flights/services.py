@@ -36,3 +36,4 @@ def generate_unique_search_id(
 def generate_unique_trip_id(full_trip_str: str) -> str:
     '''Generates a unique trip ID based on what flights are connected.'''
     return hashlib.md5(full_trip_str.encode()).hexdigest()
+

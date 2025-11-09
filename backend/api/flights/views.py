@@ -18,6 +18,7 @@ from api.searches.serializers import SearchSerializer
 from api.searches.models import Search
 from .services import generate_unique_search_id, generate_unique_trip_id
 
+
 class FlightSearchView(APIView):
     """
     Proxy GET requests to SerpAPI (google_flights).
@@ -36,7 +37,7 @@ class FlightSearchView(APIView):
         in db and was made previously, returns those search results.
         Otherwise it queries serpapi and returns new search data.
         """
-        print(">>> get request")
+        print(">>> views debugging <<<")
         api_key = os.environ.get("SERP_API_KEY") # the api key is in the elastic beanstalk
         if not api_key:
             return Response({"error": "SERP_API_KEY not configured"},
@@ -100,27 +101,37 @@ class FlightSearchView(APIView):
                     # price / meta may be on the itinerary level
                     itinerary_price = itinerary.get("price")
                     airline_logo = itinerary.get("airline_logo")
-                    type = itinerary.get("type")
+                    flight_type = itinerary.get("type")
                     flights = itinerary.get("flights")
                     trip_id = generate_unique_trip_id(json.dumps(flights))
 
                     for flight in flights:
+                        departure_datetime = flight.get("departure_airport").get("time")
+                        departure_date = departure_datetime[:-6]
+                        departure_time = departure_datetime[-5:]
+
+                        arrival_datetime = flight.get("arrival_airport").get("time")
+                        arrival_date = arrival_datetime[:-6]
+                        print(arrival_date)
+                        arrival_time = arrival_datetime[-5:]
+
                         flight_dict = {
                             'search_id': search_id,
                             'trip_id': trip_id,
-                            'departure_id': flight.get("departure_id"),
+                            'departure_id': flight.get("departure_airport").get("id"),
                             'departure_airport': flight.get("departure_airport").get("name"),
-                            'arrival_id': flight.get("arrival_id"),
-                            'departure_time': flight.get("departure_airport").get("departure_time"),
-                            'arrival_time': flight.get("arrival_airport").get("arrival_time"),
+                            'departure_time': departure_time,
+                            'arrival_id': flight.get("arrival_airport").get("id"),
+                            'arrival_time': arrival_time,
                             'arrival_airport': flight.get("arrival_airport").get("name"),
-                            'type': type,
+                            'type': flight_type,
                             'price': itinerary_price,
                             'duration': flight.get("duration"),
-                            'outbound_date': flight.get("outbound_date"),
+                            'outbound_date': departure_date,
+                            'arrival_date': arrival_date,
                             'travel_class': flight.get("travel_class"),
                             'airline_logo': airline_logo,
-                            'airline_name': flight.get("airline_name")
+                            'airline_name': flight.get("airline")
                         }
                         #print(">>> flight_dict:", flight_dict)
                         print(flight_dict)
@@ -131,7 +142,6 @@ class FlightSearchView(APIView):
                 print(">>> Flights saved")
 
             except ValueError:
-                print("Raising value error")
                 return Response({"error": "SerpAPI returned non-JSON",
                                  "text": r.text[:200]},
                                  status=status.HTTP_502_BAD_GATEWAY)
@@ -139,5 +149,7 @@ class FlightSearchView(APIView):
         print(">>> Getting flights by search_id")
         get_flights_by_search_id = FlightSerializer.get_flights_by_search_id(search_id)
         print(">>> Flights found")
-        flights = serializers.serialize("json", get_flights_by_search_id)
+        flights_dict = {"flights": get_flights_by_search_id}
+        #print(flights_dict)
+        flights = json.dumps(flights_dict, indent=2)
         return Response(flights)
