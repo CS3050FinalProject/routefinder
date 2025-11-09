@@ -123,6 +123,7 @@ class FlightSearchView(APIView):
                             'airline_name': flight.get("airline_name")
                         }
                         #print(">>> flight_dict:", flight_dict)
+                        print(flight_dict)
                         flights_to_save.append(flight_dict)
                 
                 print(">>> Saving flights")
