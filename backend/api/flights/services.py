@@ -2,9 +2,25 @@
 '''
 import json
 import hashlib
+from datetime import timedelta
+from django.utils import timezone
 from django.db import transaction
 from .models import Flight
+from ..searches.models import Search
 from .serializers import FlightSerializer
+
+def prune_old_searches(hours: int = 1) -> int:
+    """
+    Delete Search rows older than `hours` and associated Flight rows.
+    Returns number of deleted Search rows.
+    """
+    one_hour_ago = timezone.now() - timedelta(hours=1)
+
+    old_searches = Search.objects.filter(created_at__lt=one_hour_ago)
+
+    deleted_count, _ = old_searches.delete()
+
+    return deleted_count
 
 def save_flights(data, batch_size: int=10) -> dict:
     '''Saves a list of flight objects in json or python dictionary format.'''
