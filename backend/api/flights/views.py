@@ -95,7 +95,14 @@ class FlightSearchView(APIView):
                 print(">>> Parsing SERP query json")
                 data = r.json()
                 # Extract list of itineraries (adjust key if SerpAPI response uses a different one)
-                best_flights = data.get("best_flights") or data.get("flights") or []
+                best_flights = data.get("best_flights") or data.get("flights") or None
+                try:
+                    if not best_flights:
+                        raise ValueError
+                except ValueError:
+                    return Response({"error": "SerpAPI returned non-parseable JSON",
+                                    "text": r.text[:200]},
+                                    status=status.HTTP_502_BAD_GATEWAY)
 
                 flights_to_save = []
                 for itinerary in best_flights:
