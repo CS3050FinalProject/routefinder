@@ -19,14 +19,14 @@ def get_test(endpoint):
         "hl": "en",
         #"type": 1,
         "outbound_date": "2025-11-10",
-        "return_date": "2025-11-12",
+        "return_date": "2025-11-13",
         #"travel_class": 1,
         #"exclude_basic": False,
         "currency": "USD",
         #"deep_search": False
     })
     data = get_response.json()
-    print(json.dumps(data, indent=2))
+    print(data)
 
 
 if __name__ == "__main__":
