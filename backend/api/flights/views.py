@@ -94,6 +94,7 @@ class FlightSearchView(APIView):
             try:
                 print(">>> Parsing SERP query json")
                 data = r.json()
+                print(">>> SERP data:", json.dumps(data, indent=2))
                 # Extract list of itineraries (adjust key if SerpAPI response uses a different one)
                 best_flights = data.get("best_flights") or data.get("flights") or None
                 try:
