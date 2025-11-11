@@ -1,7 +1,17 @@
 //imports
 
 import React, { useState } from "react";
+import Button from 'react-bootstrap/Button';
+import Col from 'react-bootstrap/Col';
+import Form from 'react-bootstrap/Form';
+import Row from 'react-bootstrap/Row';
+import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import { Plane, TrainFront, Rat, Redo, BusFront } from "lucide-react";
+import { ReactComponent as RoutefinderLogo } from './images/Logo.svg';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import {FormGroup} from "react-bootstrap";
+
 
 
 export default function AirportRoutes() {
@@ -10,12 +20,108 @@ export default function AirportRoutes() {
   const [routes, setRoutes] = useState([]);
   const [showRoutes, setShowRoutes] = useState(false);
 
+
+  const current = new Date();
+  const date = `${current.getMonth()+1}/${current.getDate()}/${current.getFullYear()}`;
+  const next_date = `${current.getMonth()+1}/${current.getDate()+1}/${current.getFullYear()}`;
+
+  function DirectSwitch() {
+  return (
+      <Form.Check
+        type="switch"
+        id="DirectSwitch"
+        label="Direct?"
+      />
+  );
+}
+
+function TravelClassSelect() {
+  return (
+      <FormGroup>
+        <FloatingLabel controlId="floatingSelect" label="Travel Class Selection">
+          <Form.Select aria-label="Travel Class Selections" >
+            <option value="1">Economy</option>
+            <option value="2">Business</option>
+            <option value="3">First Class</option>
+          </Form.Select>
+        </FloatingLabel>
+      </FormGroup>
+  );
+}
+
+
+const DateRangeWithPortal = () => {
+    // keep dateRange as a stateful array [startDate, endDate]
+    const [dateRange, setDateRange] = useState([date, next_date]);
+    const [startDate, endDate] = dateRange;
+
+    return (
+      <DatePicker
+        selected={startDate}
+        startDate={startDate}
+        endDate={endDate}
+        onChange={(update) => {
+          setDateRange(update);
+        }}
+        selectsRange
+        withPortal
+        placeholderText="Select date range"
+      />
+    );
+  };
+
+  function Form_Grid() {
+  return (
+    <Form onSubmit={handleSubmit}>
+      <Row>
+        <Col>
+          <input
+              type="text"
+              placeholder="Origin Airport (e.g. JFK)"
+              value={origin}
+              onChange={(e) => setOrigin(e.target.value)}
+              className="border rounded-lg p-2 w-64 text-center"
+          />
+        </Col>
+        <Col>
+          <Redo/>
+        </Col>
+        <Col>
+          <input
+              type="text"
+              placeholder="Destination Airport (e.g. LAX)"
+              value={destination}
+              onChange={(e) => setDestination(e.target.value)}
+              className="border rounded-lg p-2 w-64 text-center"
+          />
+        </Col>
+        <Col>
+          <Button variant="primary" type="submit">
+            Find Routes
+          </Button>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <DateRangeWithPortal className="col-span-3 justify-center mt-3"/>
+        </Col>
+        <Col>
+          <TravelClassSelect />
+        </Col>
+        <Col>
+          <DirectSwitch />
+        </Col>
+      </Row>
+    </Form>
+  );
+  }
+
   // Dummy route data. just call the function with the data we get from the api
   const dummyRoutes = [
-    { id: 1, vehicleType: "Plane", company: "Delta Airlines", cost: "350", layovers: ["ORD"] },
-    { id: 2, vehicleType: "Plane", company: "United Airlines", cost: "420", layovers: ["DFW", "DEN"] },
-    { id: 3, vehicleType: "Train", company: "Amtrak", cost: "6969696", layovers: [] },
-    { id: 4, vehicleType: "Bus", company: "GreyHound", cost: "25", layovers: ["JFK"] },
+    {id: 1, vehicleType: "Plane", company: "Delta Airlines", cost: "350", layovers: ["ORD"]},
+    {id: 2, vehicleType: "Plane", company: "United Airlines", cost: "420", layovers: ["DFW", "DEN"]},
+    {id: 3, vehicleType: "Train", company: "Amtrak", cost: "6969696", layovers: []},
+    {id: 4, vehicleType: "Bus", company: "GreyHound", cost: "25", layovers: ["JFK"] },
     { id: 5, vehicleType: "Plane", company: "Ryanair", cost: "50", layovers: ["DFW", "DEN", "KAS", 'JFK'] },
     { id: 6, vehicleType: "Train", company: "BNSF Railway", cost: "3043", layovers: ["KAS", 'JFK'] },
     { id: 7, vehicleType: "Train", company: "Union Pacific", cost: "291", layovers: ["KSF", 'PEO'] },
@@ -83,49 +189,26 @@ export default function AirportRoutes() {
     <div className="min-h-screen flex justify-center items-center bg-slate-50 text-gray-800 p-6">
       <div className="w-full max-w-2xl flex flex-col items-center text-center">
         <header className={""}>
-          <h1 className="text-3xl font-bold mb-6">Airport Route Finder</h1>
+          <a href={'http://localhost:3000'}>
+            <RoutefinderLogo width={200} height={200} className="mt-4"/>
+          </a>
+          <Form_Grid />
 
-          <form
-            onSubmit={handleSubmit}
-            className="flex flex-col items-center gap-3 bg-white p-6 rounded-2xl shadow-lg mb-8 w-full"
-          >
-            <input
-              type="text"
-              placeholder="Origin Airport (e.g. JFK)"
-              value={origin}
-              onChange={(e) => setOrigin(e.target.value)}
-              className="border rounded-lg p-2 w-64 text-center"
-            />
 
-            <Redo></Redo>
-
-            <input
-              type="text"
-              placeholder="Destination Airport (e.g. LAX)"
-              value={destination}
-              onChange={(e) => setDestination(e.target.value)}
-              className="border rounded-lg p-2 w-64 text-center"
-            />
-            <button
-              type="submit"
-              className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition w-64"
-            >
-              Find Routes
-            </button>
-          </form>
         </header>
 
         {routes.length > 0 && (
-          <div className="flex flex-col items-center mt-8 w-full">
-            <h2 className="text-xl font-semibold mb-4">Available Routes:</h2>
-            <div className="routes">
-            {routes.map((route) => (
-              <RouteCard key={route.id} {...route} />
-            ))}
+            <div className="flex flex-col items-center mt-8 w-full">
+              <h2 className="text-xl font-semibold mb-4">Available Routes:</h2>
+              <div className="routes">
+                {routes.map((route) => (
+                    <RouteCard key={route.id} {...route} />
+                ))}
+              </div>
             </div>
-          </div>
         )}
       </div>
     </div>
   );
 }
+
