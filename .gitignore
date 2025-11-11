@@ -206,5 +206,8 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
-# Elastic Beanstalk stuff
-#.ebextensions/
+# Elastic Beanstalk Files
+backend/.elasticbeanstalk/*
+
+# txt files from debugging
+serp_response.txt
