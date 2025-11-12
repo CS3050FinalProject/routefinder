@@ -13,24 +13,20 @@ import "react-datepicker/dist/react-datepicker.css";
 import {FormGroup} from "react-bootstrap";
 
 
+  const isValidateText = (value) => {
+      const regex = /^[A-Za-z]+$/; // only English letters
+      const isValid = regex.test(value);
 
-export default function AirportRoutes() {
-  const [origin, setOrigin] = useState("");
-  const [destination, setDestination] = useState("");
-  const [routes, setRoutes] = useState([]);
-  const [showRoutes, setShowRoutes] = useState(false);
+      return isValid;
+};
 
-
-  const current = new Date();
-  const date = `${current.getMonth()+1}/${current.getDate()}/${current.getFullYear()}`;
-  const next_date = `${current.getMonth()+1}/${current.getDate()+1}/${current.getFullYear()}`;
 
   function DirectSwitch() {
   return (
       <Form.Check
         type="switch"
-        id="DirectSwitch"
-        label="Direct?"
+        id="RoundTripSwitch"
+        label="Round Trip?"
       />
   );
 }
@@ -52,6 +48,9 @@ function TravelClassSelect() {
 
 const DateRangeWithPortal = () => {
     // keep dateRange as a stateful array [startDate, endDate]
+    const current = new Date();
+    const date = `${current.getMonth()+1}/${current.getDate()}/${current.getFullYear()}`;
+    const next_date = `${current.getMonth()+1}/${current.getDate()+1}/${current.getFullYear()}`;
     const [dateRange, setDateRange] = useState([date, next_date]);
     const [startDate, endDate] = dateRange;
 
@@ -70,29 +69,29 @@ const DateRangeWithPortal = () => {
     );
   };
 
-  function Form_Grid() {
+  function Form_Grid({ origin, setOrigin, destination, setDestination, handleSubmit }) {
   return (
     <Form onSubmit={handleSubmit}>
       <Row>
         <Col>
           <input
-              type="text"
-              placeholder="Origin Airport (e.g. JFK)"
-              value={origin}
-              onChange={(e) => setOrigin(e.target.value)}
-              className="border rounded-lg p-2 w-64 text-center"
+            type="text"
+            placeholder="Origin Airport (e.g. JFK)"
+            value={origin}
+            onChange={(e) => setOrigin(e.target.value)}
+            className="border rounded-lg p-2 w-64 text-center"
           />
         </Col>
-        <Col>
-          <Redo/>
+        <Col className="flex items-center justify-center">
+          <Redo />
         </Col>
         <Col>
           <input
-              type="text"
-              placeholder="Destination Airport (e.g. LAX)"
-              value={destination}
-              onChange={(e) => setDestination(e.target.value)}
-              className="border rounded-lg p-2 w-64 text-center"
+            type="text"
+            placeholder="Destination Airport (e.g. LAX)"
+            value={destination}
+            onChange={(e) => setDestination(e.target.value)}
+            className="border rounded-lg p-2 w-64 text-center"
           />
         </Col>
         <Col>
@@ -101,9 +100,10 @@ const DateRangeWithPortal = () => {
           </Button>
         </Col>
       </Row>
-      <Row>
+
+      <Row className="mt-3">
         <Col>
-          <DateRangeWithPortal className="col-span-3 justify-center mt-3"/>
+          <DateRangeWithPortal />
         </Col>
         <Col>
           <TravelClassSelect />
@@ -116,39 +116,12 @@ const DateRangeWithPortal = () => {
   );
   }
 
-  // Dummy route data. just call the function with the data we get from the api
-  const dummyRoutes = [
-    {id: 1, vehicleType: "Plane", company: "Delta Airlines", cost: "350", layovers: ["ORD"]},
-    {id: 2, vehicleType: "Plane", company: "United Airlines", cost: "420", layovers: ["DFW", "DEN"]},
-    {id: 3, vehicleType: "Train", company: "Amtrak", cost: "6969696", layovers: []},
-    {id: 4, vehicleType: "Bus", company: "GreyHound", cost: "25", layovers: ["JFK"] },
-    { id: 5, vehicleType: "Plane", company: "Ryanair", cost: "50", layovers: ["DFW", "DEN", "KAS", 'JFK'] },
-    { id: 6, vehicleType: "Train", company: "BNSF Railway", cost: "3043", layovers: ["KAS", 'JFK'] },
-    { id: 7, vehicleType: "Train", company: "Union Pacific", cost: "291", layovers: ["KSF", 'PEO'] },
-    { id: 8, vehicleType: "Train", company: "Norfolk Southern", cost: "48", layovers: [] },
-    { id: 9, vehicleType: "Bus", company: "GMT", cost: "38", layovers: [] },
-    { id: 10, vehicleType: "buss", company: "fake company 1", cost: "23", layovers: ["helLA"] },
-    { id: 11, vehicleType: "ahbfa", company: "fake company 2", cost: "232", layovers: ["hell"] },
-  ];
-
-  // error handling on blank input
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (origin && destination){
-      setRoutes(dummyRoutes);
-      setTimeout(() => setShowRoutes(true), 1000);
-
-    }
-    else alert("Please enter both origin and destination airports.");
-  };
-
-
   {/* RouteCard
   A function that takes data about the trip (I forgot what data we were using but this is easily expanded)
   returns a card containing all that data formatted horizontally
   I only return a a string of vehicleType rn because idk what images were putting here  */}
 
-  const RouteCard = ({ vehicleType, company, cost, layovers }) => {
+  const RouteCard = ({ vehicleType, company, cost, layovers, showRoutes }) => {
   let IconComponent;
 
   // Pick which icon to use
@@ -184,6 +157,46 @@ const DateRangeWithPortal = () => {
   );
 };
 
+  export default function AirportRoutes() {
+  const [origin, setOrigin] = useState("");
+  const [destination, setDestination] = useState("");
+  const [routes, setRoutes] = useState([]);
+  const [showRoutes, setShowRoutes] = useState(false);
+
+
+
+
+  // Dummy route data. just call the function with the data we get from the api
+  const dummyRoutes = [
+    {id: 1, vehicleType: "Plane", company: "Delta Airlines", cost: "350", layovers: ["ORD"]},
+    {id: 2, vehicleType: "Plane", company: "United Airlines", cost: "420", layovers: ["DFW", "DEN"]},
+    {id: 3, vehicleType: "Train", company: "Amtrak", cost: "6969696", layovers: []},
+    {id: 4, vehicleType: "Bus", company: "GreyHound", cost: "25", layovers: ["JFK"] },
+    { id: 5, vehicleType: "Plane", company: "Ryanair", cost: "50", layovers: ["DFW", "DEN", "KAS", 'JFK'] },
+    { id: 6, vehicleType: "Train", company: "BNSF Railway", cost: "3043", layovers: ["KAS", 'JFK'] },
+    { id: 7, vehicleType: "Train", company: "Union Pacific", cost: "291", layovers: ["KSF", 'PEO'] },
+    { id: 8, vehicleType: "Train", company: "Norfolk Southern", cost: "48", layovers: [] },
+    { id: 9, vehicleType: "Bus", company: "GMT", cost: "38", layovers: [] },
+    { id: 10, vehicleType: "buss", company: "fake company 1", cost: "23", layovers: ["helLA"] },
+    { id: 11, vehicleType: "ahbfa", company: "fake company 2", cost: "232", layovers: ["hell"] },
+  ];
+
+  // error handling on blank input
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (origin && destination){
+      setRoutes(dummyRoutes);
+      setTimeout(() => setShowRoutes(true), 1000);
+
+    }
+    else alert("Please enter both origin and destination airports.");
+    //Validation
+
+  };
+
+
+
+
 {/* Da meat */}
   return (
     <div className="min-h-screen flex justify-center items-center bg-slate-50 text-gray-800 p-6">
@@ -192,7 +205,13 @@ const DateRangeWithPortal = () => {
           <a href={'http://localhost:3000'}>
             <RoutefinderLogo width={200} height={200} className="mt-4"/>
           </a>
-          <Form_Grid />
+           <Form_Grid
+            origin={origin}
+            setOrigin={setOrigin}
+            destination={destination}
+            setDestination={setDestination}
+            handleSubmit={handleSubmit}
+          />
 
 
         </header>
@@ -202,7 +221,7 @@ const DateRangeWithPortal = () => {
               <h2 className="text-xl font-semibold mb-4">Available Routes:</h2>
               <div className="routes">
                 {routes.map((route) => (
-                    <RouteCard key={route.id} {...route} />
+                    <RouteCard key={route.id} {...route} showRoutes={showRoutes}/>
                 ))}
               </div>
             </div>
