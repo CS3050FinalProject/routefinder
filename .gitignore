@@ -214,3 +214,6 @@ db_creds.txt
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 *.zip
+
+# sample api response for debugging
+backend/serp_response.txt
