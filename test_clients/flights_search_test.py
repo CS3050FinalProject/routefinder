@@ -13,7 +13,7 @@ def get_test(endpoint):
         "hl": "en",
         "type": 2,
         "outbound_date": "2025-11-14",
-        "return_date": "2025-11-15",
+        "return_date": "2025-11-18",
         #"travel_class": 1,
         #"exclude_basic": False,
         "currency": "USD",
