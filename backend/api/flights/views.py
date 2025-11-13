@@ -102,6 +102,7 @@ class FlightSearchView(APIView):
                 # Extract list of itineraries (adjust key if SerpAPI response uses a different one)
                 best_flights = data.get("best_flights") or None
                 other_flights = data.get("other_flights") or None
+                #print(f">>> Flight data: \nbest_flights: {best_flights}\nother_flights: {other_flights}")
                 try:
                     if not best_flights and not other_flights:
                         raise ValueError
@@ -111,23 +112,29 @@ class FlightSearchView(APIView):
                                     status=status.HTTP_502_BAD_GATEWAY)
 
                 print(">>> Calling flights_to_save")
-                flights_to_save = parse_flights_json(best_flights, search_id)
-                print(">>> Saving best flights")
-                FlightSerializer.save_flights(data=flights_to_save)
-                print(">>> Flights saved")
+                if best_flights:
+                    flights_to_save = parse_flights_json(best_flights, search_id)
+                    print(">>> Saving best flights")
+                    FlightSerializer.save_flights(data=flights_to_save)
+                    print(">>> Flights saved")
+                if other_flights:
+                    flights_to_save = parse_flights_json(other_flights, search_id)
+                    print(">>> Saving other flights")
+                    FlightSerializer.save_flights(data=flights_to_save)
+                    print(">>> Flights saved")
 
-                print(">>> Calling flights_to_save")
-                flights_to_save = parse_flights_json(other_flights, search_id)
-                print(">>> Saving other flights")
-                FlightSerializer.save_flights(data=flights_to_save)
-                print(">>> Flights saved")
             except ValueError:
                 return Response({"error": "SerpAPI returned non-JSON",
                                  "text": r.text[:200]},
                                  status=status.HTTP_502_BAD_GATEWAY)
         #print("checkpoint")
         print(">>> Getting flights by search_id")
-        get_flights_by_search_id = FlightSerializer.get_flights_by_search_id(search_id)
+        try:
+            get_flights_by_search_id = FlightSerializer.get_flights_by_search_id(search_id)
+        except Exception as e:
+            print(e)
+            return Response({"error": "There are no saved flights for this search"},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # group flights by trip_id into trips, preserving insertion order
         trips_map = {}

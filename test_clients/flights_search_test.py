@@ -8,12 +8,12 @@ def get_test(endpoint):
     print("*"*30)
     get_response = requests.get(endpoint, params={
         "departure_id": "SFO",
-        "arrival_id": "EWR",
+        "arrival_id": "MIA",
         #"gl": "us",
         "hl": "en",
         "type": 2,
-        "outbound_date": "2025-11-14",
-        "return_date": "2025-11-18",
+        "outbound_date": "2025-12-14",
+        "return_date": "2025-12-19",
         #"travel_class": 1,
         #"exclude_basic": False,
         "currency": "USD",

@@ -56,7 +56,7 @@ def generate_unique_trip_id(full_trip_str: str) -> str:
     return hashlib.md5(full_trip_str.encode()).hexdigest()
 
 def parse_flights_json(flights_list: list, search_id: str) -> Optional[list]:
-    print(flights_list)
+    #print(flights_list)
     flights_to_save = []
     for itinerary in flights_list:
         # print(itinerary)
@@ -94,8 +94,6 @@ def parse_flights_json(flights_list: list, search_id: str) -> Optional[list]:
                 'airline_logo': airline_logo,
                 'airline_name': flight.get("airline")
             }
-            #print(">>> flight_dict:", flight_dict)
-            #print(flight_dict)
             flights_to_save.append(flight_dict)
 
     return None if not flights_to_save else flights_to_save

@@ -45,7 +45,7 @@ class FlightSerializer(serializers.ModelSerializer):
         if isinstance(data, str):
             data = json.loads(data)
             print("--- Data is str")
-        if not isinstance(data, list):
+        elif not isinstance(data, list):
             raise ValueError("--- Expected a list of flight objects")
 
         print("--- Serializing flights")
@@ -80,13 +80,18 @@ class FlightSerializer(serializers.ModelSerializer):
         return {"created": len(created_objs), "created_objs": created_objs}
 
 
-    def get_flights_by_search_id(search_id: str):
+    def get_flights_by_search_id(search_id: str, limit=15) -> list[dict]:
         '''Retrieve flights by search_id. Returns a list of flight dicts.'''
         # If found, return existing search data (fetch flights from DB)
         print("--- Checking if flight objects exist")
-        if Flight.objects.all().exists():
-            flights = Flight.objects.filter(search_id=search_id)
-            print("--- Flights found:")
+        flights = Flight.objects.filter(search_id=search_id)
+        print(len(flights))
+        if len(flights) > limit:
+            flights = flights[:15]
+        elif not flights:
+            print("--- No flights found.")
+            raise Exception("No flights found for given search_id.")
+        #print(f"--- {len(flights)} flights found, returning {limit}")
 
         print("--- Creating flights_list")
         flights_list = []
@@ -111,6 +116,6 @@ class FlightSerializer(serializers.ModelSerializer):
                 }
                 flights_list.append(flight_dict)
 
-        print("-- flights_list created, returning now")
+        print("--- flights_list created, returning now")
         return flights_list
 
