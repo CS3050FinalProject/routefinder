@@ -11,7 +11,7 @@ class Flight(models.Model):
     """
     # Google Flights API fields
     #flight_id = models.CharField(max_length=10, primary_key=True)
-    search_id = models.ForeignKey('searches.Search', on_delete=models.DO_NOTHING)
+    search_id = models.ForeignKey('searches.Search', on_delete=models.CASCADE)
     trip_id = models.TextField(default='noid')
     departure_id = models.CharField(max_length=3)
     departure_airport = models.TextField(null=True)

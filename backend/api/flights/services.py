@@ -4,7 +4,9 @@ import json
 import hashlib
 from django.db import transaction
 from .models import Flight
+from ..searches.models import Search
 from .serializers import FlightSerializer
+
 
 def save_flights(data, batch_size: int=10) -> dict:
     '''Saves a list of flight objects in json or python dictionary format.'''

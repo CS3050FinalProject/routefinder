@@ -37,6 +37,7 @@ class FlightSearchView(APIView):
         in db and was made previously, returns those search results.
         Otherwise it queries serpapi and returns new search data.
         """
+
         print(">>> views debugging <<<")
         api_key = os.environ.get("SERP_API_KEY") # the api key is in the elastic beanstalk
         if not api_key:
@@ -92,8 +93,21 @@ class FlightSearchView(APIView):
             try:
                 print(">>> Parsing SERP query json")
                 data = r.json()
+
+                # Save serp response to file for debugging
+                #with open('serp_response.txt', 'w') as f:
+                #    f.write(json.dumps(data, indent=2))
+
                 # Extract list of itineraries (adjust key if SerpAPI response uses a different one)
-                best_flights = data.get("best_flights") or data.get("flights") or []
+                best_flights = data.get("best_flights") or None
+                other_flights = data.get("other_flights") or None
+                try:
+                    if not best_flights or not other_flights:
+                        raise ValueError
+                except ValueError:
+                    return Response({"error": "SerpAPI returned non-parseable JSON",
+                                    "text": r.text[:200]},
+                                    status=status.HTTP_502_BAD_GATEWAY)
 
                 flights_to_save = []
                 for itinerary in best_flights:
@@ -112,7 +126,6 @@ class FlightSearchView(APIView):
 
                         arrival_datetime = flight.get("arrival_airport").get("time")
                         arrival_date = arrival_datetime[:-6]
-                        print(arrival_date)
                         arrival_time = arrival_datetime[-5:]
 
                         flight_dict = {
@@ -134,7 +147,7 @@ class FlightSearchView(APIView):
                             'airline_name': flight.get("airline")
                         }
                         #print(">>> flight_dict:", flight_dict)
-                        print(flight_dict)
+                        #print(flight_dict)
                         flights_to_save.append(flight_dict)
                 
                 print(">>> Saving flights")
@@ -148,8 +161,34 @@ class FlightSearchView(APIView):
         #print("checkpoint")
         print(">>> Getting flights by search_id")
         get_flights_by_search_id = FlightSerializer.get_flights_by_search_id(search_id)
-        print(">>> Flights found")
-        flights_dict = {"flights": get_flights_by_search_id}
-        #print(flights_dict)
+
+        # group flights by trip_id into trips, preserving insertion order
+        trips_map = {}
+        for f in get_flights_by_search_id:
+            tid = f.get("trip_id")
+            if tid not in trips_map:
+                trips_map[tid] = {
+                    "price": f.get("price"),
+                    "type": f.get("type"),
+                    "travel_class": f.get("travel_class"),
+                    "flights": [],
+                }
+            # append flight leg (keep the same field shape as stored)
+            trips_map[tid]["flights"].append({
+                "departure_id": f.get("departure_id"),
+                "departure_airport": f.get("departure_airport"),
+                "departure_time": f.get("departure_time"),
+                "outbound_date": f.get("outbound_date"),
+                "arrival_id": f.get("arrival_id"),
+                "arrival_airport": f.get("arrival_airport"),
+                "arrival_time": f.get("arrival_time"),
+                "arrival_date": f.get("arrival_date"),
+                "duration": f.get("duration"),
+                "airline_name": f.get("airline_name"),
+                "airline_logo": f.get("airline_logo")
+            })
+
+        trips = list(trips_map.values())
+        flights_dict = {"Trips": trips}
         flights = json.dumps(flights_dict, indent=2)
-        return Response(flights)
+        return Response(flights, status=status.HTTP_200_OK)
