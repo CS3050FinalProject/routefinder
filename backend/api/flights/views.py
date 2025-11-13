@@ -42,7 +42,7 @@ class FlightSearchView(APIView):
         print(">>> views debugging <<<")
         api_key = os.environ.get("SERP_API_KEY") # the api key is in the elastic beanstalk
         if not api_key:
-            return Response({"error": "SERP_API_KEY not configured"},
+            return Response({"irror": "SERP_API_KEY not configured"},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         print("WARNING: IS YOUR SUPABASE URL KEY CONFIGURED FOR LOCAL ENVIRONMENT?")
 
@@ -138,7 +138,7 @@ class FlightSearchView(APIView):
 
         # group flights by trip_id into trips, preserving insertion order
         trips_map = {}
-        for f in get_flights_by_search_id:
+i       for f in get_flights_by_search_id:
             tid = f.get("trip_id")
             if tid not in trips_map:
                 trips_map[tid] = {

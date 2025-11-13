@@ -12,7 +12,7 @@ def get_test(endpoint):
         #"gl": "us",
         "hl": "en",
         "type": 2,
-        "outbound_date": "2025-12-14",
+        "outbound_date": "2025-12-10",
         "return_date": "2025-12-19",
         #"travel_class": 1,
         #"exclude_basic": False,

@@ -85,7 +85,6 @@ class FlightSerializer(serializers.ModelSerializer):
         # If found, return existing search data (fetch flights from DB)
         print("--- Checking if flight objects exist")
         flights = Flight.objects.filter(search_id=search_id)
-        print(len(flights))
         if len(flights) > limit:
             flights = flights[:15]
         elif not flights:
