@@ -16,7 +16,7 @@ from .models import Flight
 from .serializers import FlightSerializer
 from api.searches.serializers import SearchSerializer
 from api.searches.models import Search
-from .services import generate_unique_search_id, generate_unique_trip_id
+from .services import generate_unique_search_id, generate_unique_trip_id, prune_old_searches, parse_flights_json
 
 
 class FlightSearchView(APIView):
@@ -37,11 +37,12 @@ class FlightSearchView(APIView):
         in db and was made previously, returns those search results.
         Otherwise it queries serpapi and returns new search data.
         """
+        #prune_old_searches(hours=1)
 
         print(">>> views debugging <<<")
         api_key = os.environ.get("SERP_API_KEY") # the api key is in the elastic beanstalk
         if not api_key:
-            return Response({"error": "SERP_API_KEY not configured"},
+            return Response({"irror": "SERP_API_KEY not configured"},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         print("WARNING: IS YOUR SUPABASE URL KEY CONFIGURED FOR LOCAL ENVIRONMENT?")
 
@@ -101,58 +102,26 @@ class FlightSearchView(APIView):
                 # Extract list of itineraries (adjust key if SerpAPI response uses a different one)
                 best_flights = data.get("best_flights") or None
                 other_flights = data.get("other_flights") or None
+                #print(f">>> Flight data: \nbest_flights: {best_flights}\nother_flights: {other_flights}")
                 try:
-                    if not best_flights or not other_flights:
+                    if not best_flights and not other_flights:
                         raise ValueError
                 except ValueError:
                     return Response({"error": "SerpAPI returned non-parseable JSON",
                                     "text": r.text[:200]},
                                     status=status.HTTP_502_BAD_GATEWAY)
 
-                flights_to_save = []
-                for itinerary in best_flights:
-                    # print(itinerary)
-                    # price / meta may be on the itinerary level
-                    itinerary_price = itinerary.get("price")
-                    airline_logo = itinerary.get("airline_logo")
-                    flight_type = itinerary.get("type")
-                    flights = itinerary.get("flights")
-                    trip_id = generate_unique_trip_id(json.dumps(flights))
-
-                    for flight in flights:
-                        departure_datetime = flight.get("departure_airport").get("time")
-                        departure_date = departure_datetime[:-6]
-                        departure_time = departure_datetime[-5:]
-
-                        arrival_datetime = flight.get("arrival_airport").get("time")
-                        arrival_date = arrival_datetime[:-6]
-                        arrival_time = arrival_datetime[-5:]
-
-                        flight_dict = {
-                            'search_id': search_id,
-                            'trip_id': trip_id,
-                            'departure_id': flight.get("departure_airport").get("id"),
-                            'departure_airport': flight.get("departure_airport").get("name"),
-                            'departure_time': departure_time,
-                            'arrival_id': flight.get("arrival_airport").get("id"),
-                            'arrival_time': arrival_time,
-                            'arrival_airport': flight.get("arrival_airport").get("name"),
-                            'type': flight_type,
-                            'price': itinerary_price,
-                            'duration': flight.get("duration"),
-                            'outbound_date': departure_date,
-                            'arrival_date': arrival_date,
-                            'travel_class': flight.get("travel_class"),
-                            'airline_logo': airline_logo,
-                            'airline_name': flight.get("airline")
-                        }
-                        #print(">>> flight_dict:", flight_dict)
-                        #print(flight_dict)
-                        flights_to_save.append(flight_dict)
-                
-                print(">>> Saving flights")
-                FlightSerializer.save_flights(data=flights_to_save)
-                print(">>> Flights saved")
+                print(">>> Calling flights_to_save")
+                if best_flights:
+                    flights_to_save = parse_flights_json(best_flights, search_id)
+                    print(">>> Saving best flights")
+                    FlightSerializer.save_flights(data=flights_to_save)
+                    print(">>> Flights saved")
+                if other_flights:
+                    flights_to_save = parse_flights_json(other_flights, search_id)
+                    print(">>> Saving other flights")
+                    FlightSerializer.save_flights(data=flights_to_save)
+                    print(">>> Flights saved")
 
             except ValueError:
                 return Response({"error": "SerpAPI returned non-JSON",
@@ -160,7 +129,12 @@ class FlightSearchView(APIView):
                                  status=status.HTTP_502_BAD_GATEWAY)
         #print("checkpoint")
         print(">>> Getting flights by search_id")
-        get_flights_by_search_id = FlightSerializer.get_flights_by_search_id(search_id)
+        try:
+            get_flights_by_search_id = FlightSerializer.get_flights_by_search_id(search_id)
+        except Exception as e:
+            print(e)
+            return Response({"error": "There are no saved flights for this search"},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # group flights by trip_id into trips, preserving insertion order
         trips_map = {}
