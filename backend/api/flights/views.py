@@ -16,7 +16,7 @@ from .models import Flight
 from .serializers import FlightSerializer
 from api.searches.serializers import SearchSerializer
 from api.searches.models import Search
-from .services import generate_unique_search_id, generate_unique_trip_id, prune_old_searches
+from .services import generate_unique_search_id, generate_unique_trip_id
 
 
 class FlightSearchView(APIView):
@@ -37,7 +37,6 @@ class FlightSearchView(APIView):
         in db and was made previously, returns those search results.
         Otherwise it queries serpapi and returns new search data.
         """
-        #prune_old_searches(hours=1)
 
         print(">>> views debugging <<<")
         api_key = os.environ.get("SERP_API_KEY") # the api key is in the elastic beanstalk
