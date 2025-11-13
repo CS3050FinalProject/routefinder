@@ -21,6 +21,9 @@ import {FormGroup} from "react-bootstrap";
 };
 
 
+
+
+
   function DirectSwitch() {
   return (
       <Form.Check
@@ -162,6 +165,9 @@ const DateRangeWithPortal = () => {
   const [destination, setDestination] = useState("");
   const [routes, setRoutes] = useState([]);
   const [showRoutes, setShowRoutes] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [responsePreview, setResponsePreview] = useState(null);
 
 
 
@@ -181,19 +187,88 @@ const DateRangeWithPortal = () => {
     { id: 11, vehicleType: "ahbfa", company: "fake company 2", cost: "232", layovers: ["hell"] },
   ];
 
-  // error handling on blank input
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (origin && destination){
-      setRoutes(dummyRoutes);
-      setTimeout(() => setShowRoutes(true), 1000);
 
+// Updated handleSubmit that uses getTestJson
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!origin || !destination) {
+    alert("Please enter both origin and destination airports.");
+    return;
+  }
+
+  const endpoint = "http://routefinder-api-env-prod.eba-egdm2f3j.us-east-1.elasticbeanstalk.com/flights/search/";
+
+  setLoading(true);
+  setError(null);
+  setResponsePreview(null);
+
+  try {
+    const params = {
+    departure_id: "PEK",
+    arrival_id: "AUS",
+    // "gl": "us",
+    hl: "en",
+    // "type": 1,
+    outbound_date: "2025-11-14",
+    return_date: "2025-11-16",
+    // "travel_class": 1,
+    // "exclude_basic": false,
+    currency: "USD",
+    // "deep_search": false
+    };
+
+    const url = new URL(endpoint);
+    Object.entries(params).forEach(([k, v]) => url.searchParams.append(k, v));
+
+    console.log("Fetching:", url.toString());
+
+    const res = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Accept": "application/json, text/plain, */*",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Request failed: ${res.status} ${res.statusText}`);
     }
-    else alert("Please enter both origin and destination airports.");
-    //Validation
 
-  };
+    const contentType = res.headers.get("content-type") || "";
+    const data = contentType.includes("application/json")
+      ? await res.json()
+      : await res.text();
 
+    console.log("API response:", data);
+    setResponsePreview(
+      typeof data === "string"
+        ? data.slice(0, 500)
+        : JSON.stringify(data, null, 2)
+    );
+
+    //should map it to a Route
+    if (data && Array.isArray(data.results)) {
+      const mappedRoutes = data.results.map((r, idx) => ({
+        id: r.id ?? idx,
+        vehicleType: r.transport ?? "plane",
+        company: r.carrier_name ?? r.operator ?? "Unknown",
+        cost: r.price ?? r.fare ?? "N/A",
+        layovers: Array.isArray(r.stops) ? r.stops : [],
+      }));
+      setRoutes(mappedRoutes);
+      setShowRoutes(true);
+    } else {
+      console.warn("No valid results array, showing dummy routes instead");
+      setRoutes(dummyRoutes);
+      setShowRoutes(true);
+    }
+  } catch (err) {
+    console.error("Fetch error:", err);
+    setError(err.message || "Unknown error occurred");
+  } finally {
+    setLoading(false);
+  }
+};
 
 
 
@@ -216,6 +291,16 @@ const DateRangeWithPortal = () => {
 
         </header>
 
+        {loading && <p>Loading…</p>}
+
+        {error && <p className="text-red-600">Error: {error}</p>}
+
+        {responsePreview && (
+          <pre className="bg-gray-100 p-3 rounded text-left overflow-auto whitespace-pre-wrap max-h-80">
+            {responsePreview}
+          </pre>
+        )}
+
         {routes.length > 0 && (
             <div className="flex flex-col items-center mt-8 w-full">
               <h2 className="text-xl font-semibold mb-4">Available Routes:</h2>
@@ -230,4 +315,7 @@ const DateRangeWithPortal = () => {
     </div>
   );
 }
+
+
+
 
