@@ -197,7 +197,7 @@ const handleSubmit = async (e) => {
     return;
   }
 
-  const endpoint = "http://routefinder-api-env-prod.eba-egdm2f3j.us-east-1.elasticbeanstalk.com/flights/search/";
+  const endpoint = "https://routefinder-api-env-prod.eba-egdm2f3j.us-east-1.elasticbeanstalk.com/flights/search/";
 
   setLoading(true);
   setError(null);
