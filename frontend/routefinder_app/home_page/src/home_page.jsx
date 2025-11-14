@@ -277,7 +277,7 @@ const handleSubmit = async (e) => {
     <div className="min-h-screen flex justify-center items-center bg-slate-50 text-gray-800 p-6">
       <div className="w-full max-w-2xl flex flex-col items-center text-center">
         <header className={""}>
-          <a href={'http://localhost:3000'}>
+          <a href={'https://main.d3oqjx740ps4dp.amplifyapp.com'}>
             <RoutefinderLogo width={200} height={200} className="mt-4"/>
           </a>
            <Form_Grid
