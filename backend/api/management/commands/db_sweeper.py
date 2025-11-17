@@ -13,7 +13,7 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         one_hour_ago = timezone.now() - timedelta(hours=1)
         old_searches = Search.objects.filter(search_datetime__lt=one_hour_ago)
-        
+
         # Delete old searches
         count, _ = old_searches.delete()
 
