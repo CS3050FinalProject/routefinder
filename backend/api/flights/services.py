@@ -2,11 +2,14 @@
 '''
 import json
 import hashlib
+from datetime import timedelta
+from typing import Optional
+
+from django.utils import timezone
 from django.db import transaction
 from .models import Flight
 from ..searches.models import Search
 from .serializers import FlightSerializer
-
 
 def save_flights(data, batch_size: int=10) -> dict:
     '''Saves a list of flight objects in json or python dictionary format.'''
@@ -39,3 +42,45 @@ def generate_unique_trip_id(full_trip_str: str) -> str:
     '''Generates a unique trip ID based on what flights are connected.'''
     return hashlib.md5(full_trip_str.encode()).hexdigest()
 
+def parse_flights_json(flights_list: list, search_id: str) -> Optional[list]:
+    #print(flights_list)
+    flights_to_save = []
+    for itinerary in flights_list:
+        # print(itinerary)
+        # price / meta may be on the itinerary level
+        itinerary_price = itinerary.get("price")
+        airline_logo = itinerary.get("airline_logo")
+        flight_type = itinerary.get("type")
+        flights = itinerary.get("flights")
+        trip_id = generate_unique_trip_id(json.dumps(flights))
+
+        for flight in flights:
+            departure_datetime = flight.get("departure_airport").get("time")
+            departure_date = departure_datetime[:-6]
+            departure_time = departure_datetime[-5:]
+
+            arrival_datetime = flight.get("arrival_airport").get("time")
+            arrival_date = arrival_datetime[:-6]
+            arrival_time = arrival_datetime[-5:]
+
+            flight_dict = {
+                'search_id': search_id,
+                'trip_id': trip_id,
+                'departure_id': flight.get("departure_airport").get("id"),
+                'departure_airport': flight.get("departure_airport").get("name"),
+                'departure_time': departure_time,
+                'arrival_id': flight.get("arrival_airport").get("id"),
+                'arrival_time': arrival_time,
+                'arrival_airport': flight.get("arrival_airport").get("name"),
+                'type': flight_type,
+                'price': itinerary_price,
+                'duration': flight.get("duration"),
+                'outbound_date': departure_date,
+                'arrival_date': arrival_date,
+                'travel_class': flight.get("travel_class"),
+                'airline_logo': airline_logo,
+                'airline_name': flight.get("airline")
+            }
+            flights_to_save.append(flight_dict)
+
+    return None if not flights_to_save else flights_to_save

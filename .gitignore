@@ -217,3 +217,7 @@ db_creds.txt
 
 # sample api response for debugging
 backend/serp_response.txt
+
+# aws certificate stuff
+backend/*.crt
+backend/*.key
