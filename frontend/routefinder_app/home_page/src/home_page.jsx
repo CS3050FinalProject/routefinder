@@ -204,8 +204,16 @@ const handleSubmit = async (e) => {
 axios.get(proxy, { params: { url: targetUrl } })
     axios.get('proxy', {
     params: {
-      ID: 12345
-    }
+    departure_id: "PEK",
+    arrival_id: "AUS",
+    // "gl": "us",
+    hl: "en",
+    // "type": 1,
+    outbound_date: "2025-11-14",
+    return_date: "2025-11-16",
+    // "travel_class": 1,
+    // "exclude_basic": false,
+    currency: "USD",    }
   })
   .then(response => {
     console.log(response.data.contents);
