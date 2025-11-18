@@ -198,7 +198,7 @@ const handleSubmit = async (e) => {
     return;
   }
 
-  const proxy = 'https://api.allorigins.win/get'
+  // const proxy = 'https://api.allorigins.win/get'
   const targetUrl = 'http://routefinder-api-env-prod.eba-egdm2f3j.us-east-1.elasticbeanstalk.com/flights/search/?' +
   new URLSearchParams({
     departure_id: "PEK",
@@ -210,7 +210,7 @@ const handleSubmit = async (e) => {
     format:       "json"
   }).toString();
 
-  axios.get(proxy, { params: { url: targetUrl } })
+  axios.get('https://api.allorigins.win/get', { params: { url: targetUrl } })
     .then(response => {
     const all_response = response.data.contents;
     try {
