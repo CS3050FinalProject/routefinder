@@ -1,0 +1,41 @@
+<!--<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="400" height="400" role="img" aria-labelledby="monTitle monDesc">-->
+<!--  <title id="monTitle">Monogram Globe logo</title>-->
+<!--  <desc id="monDesc">A circular monogram with stylized globe lines and customizable initials.</desc>-->
+
+<!--  &lt;!&ndash; outer ring &ndash;&gt;-->
+<!--  <circle cx="100" cy="86" r="66" fill="none" stroke="#0B7285" stroke-width="6"></circle>-->
+
+<!--  &lt;!&ndash; simple globe lines &ndash;&gt;-->
+<!--  <path d="M34 86h132" stroke="#0B7285" stroke-width="2" stroke-linecap="round"></path>-->
+<!--  <path d="M100 20v132" stroke="#0B7285" stroke-width="2" stroke-linecap="round"></path>-->
+<!--  <path d="M60 40c14 24 66 24 80 0" stroke="#0B7285" stroke-width="2" stroke-linecap="round"></path>-->
+<!--  <path d="M60 132c14-24 66-24 80 0" stroke="#0B7285" stroke-width="2" stroke-linecap="round"></path>-->
+
+<!--  &lt;!&ndash; initials (edit text to your initials) &ndash;&gt;-->
+<!--  <text x="100" y="96" font-family="Georgia, serif" font-size="36" text-anchor="middle" fill="#0B7285" font-weight="700">RF</text>-->
+
+<!--  &lt;!&ndash; wordmark &ndash;&gt;-->
+<!--  <text x="100" y="168" font-family="Montserrat, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#274C77" letter-spacing="1">Route Finder</text>-->
+<!--</svg>-->
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="400" height="400" role="img" aria-labelledby="monTitle monDesc">
+  <title id="monTitle">Monogram Globe logo</title>
+  <desc id="monDesc">A circular monogram with stylized globe lines and customizable initials. No black used.</desc>
+
+
+
+  <!-- outer ring (no black) -->
+  <circle cx="100" cy="86" r="66" fill="none" stroke="#0B7285" stroke-width="6"/>
+
+  <!-- simple globe lines -->
+  <path d="M34 86h132" stroke="#0B7285" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M100 20v132" stroke="#0B7285" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M60 40c14 24 66 24 80 0" stroke="#0B7285" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M60 132c14-24 66-24 80 0" stroke="#0B7285" stroke-width="2" stroke-linecap="round" fill="none"/>
+
+  <!-- initials (explicit fill; no black) -->
+  <text x="100" y="96" font-family="Georgia, serif" font-size="36" text-anchor="middle" fill="#00B4D8" font-weight="700">RF</text>
+
+  <!-- wordmark (explicit fill; no black) -->
+  <text x="100" y="168" font-family="Montserrat, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#00B4D8" letter-spacing="1">Route Finder</text>
+</svg>
