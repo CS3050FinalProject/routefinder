@@ -198,29 +198,59 @@ const handleSubmit = async (e) => {
     return;
   }
 
-  const targetUrl = 'http://routefinder-api-env-prod.eba-egdm2f3j.us-east-1.elasticbeanstalk.com/flights/search/';
-  const proxy = 'https://api.allorigins.win/get';
-
-axios.get(proxy, { params: { url: targetUrl } })
-    axios.get('proxy', {
-    params: {
+  const proxy = 'https://api.allorigins.win/get'
+  const targetUrl = 'http://routefinder-api-env-prod.eba-egdm2f3j.us-east-1.elasticbeanstalk.com/flights/search/?' +
+  new URLSearchParams({
     departure_id: "PEK",
-    arrival_id: "AUS",
-    // "gl": "us",
-    hl: "en",
-    // "type": 1,
-    outbound_date: "2025-11-14",
-    return_date: "2025-11-16",
-    // "travel_class": 1,
-    // "exclude_basic": false,
-    currency: "USD",    }
-  })
-  .then(response => {
-    console.log(response.data.contents);
+    arrival_id:   "AUS",
+    hl:           "en",
+    outbound_date:"2025-12-14",
+    return_date:  "2025-12-16",
+    currency:     "USD",
+    format:       "json"
+  }).toString();
+
+  axios.get(proxy, { params: { url: targetUrl } })
+    .then(response => {
+    const all_response = response.data.contents;
+    try {
+      const json_response = JSON.parse(all_response);
+      console.log('Parsed proxied JSON:', json_response);
+    } catch (e) {
+      console.log('Proxied text (not JSON):', all_response);
+    }
   })
   .catch(err => {
-    console.error("Request failed:", err.message);
+    console.error('Request failed:', err.message);
   });
+
+// const targetUrl = 'http://routefinder-api-env-prod.eba-egdm2f3j.us-east-1.elasticbeanstalk.com/flights/search/?' +
+//   new URLSearchParams({
+//     departure_id: "PEK",
+//     arrival_id:   "AUS",
+//     hl:           "en",
+//     outbound_date:"2025-12-14",
+//     return_date:  "2025-12-16",
+//     currency:     "USD",
+//     format:       "json"
+//   }).toString();
+//
+// // AllOrigins expects ?url=<full_target_url>
+// axios.get('https://api.allorigins.win/get', { params: { url: targetUrl } })
+//   .then(response => {
+//     // allorigins returns an object like { contents: "<raw-response>", status: { ... } }
+//     // If the proxied response is JSON you need to parse the contents string:
+//     const proxiedText = response.data.contents;
+//     try {
+//       const proxiedJson = JSON.parse(proxiedText);
+//       console.log('Parsed proxied JSON:', proxiedJson);
+//     } catch (e) {
+//       console.log('Proxied text (not JSON):', proxiedText);
+//     }
+//   })
+//   .catch(err => {
+//     console.error('Request failed:', err.message);
+//   });
 
 };
 
