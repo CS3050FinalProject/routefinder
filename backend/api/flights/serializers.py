@@ -40,32 +40,21 @@ class FlightSerializer(serializers.ModelSerializer):
         """
         Saves a list of flight objects in json or python dictionary format.
         """
-        print("--- save_flights debugging ---")
-        print("--- Checking data type")
         if isinstance(data, str):
             data = json.loads(data)
-            print("--- Data is str")
         elif not isinstance(data, list):
             raise ValueError("--- Expected a list of flight objects")
 
-        print("--- Serializing flights")
         serializer = FlightSerializer(data=data, many=True) # pass data to serializer
-        print("--- Flights serialized")
-        print("--- Checking flights validity")
         serializer.is_valid(raise_exception=True) # check data validity
         validated = serializer.validated_data # store the validated data in a variable
-        print("--- Data is valid")
 
         # Unpack the serialized data into a list of Flight objects
         try:
-            print("--- Saving flights as models")
             flights = [Flight(**item) for item in validated]
-            print(f"--- Created {len(flights)} Flight model instances")
 
-            print("--- Adding flights to DB")
             with transaction.atomic():
                 created_objs = Flight.objects.bulk_create(flights, batch_size=batch_size)
-                print(f"--- Flights added ({len(created_objs)} created)")
 
         except TypeError as e:
             print("--- Flight model creation failed (invalid field):", e)
@@ -83,38 +72,39 @@ class FlightSerializer(serializers.ModelSerializer):
     def get_flights_by_search_id(search_id: str, limit=15) -> list[dict]:
         '''Retrieve flights by search_id. Returns a list of flight dicts.'''
         # If found, return existing search data (fetch flights from DB)
-        print("--- Checking if flight objects exist")
         flights = Flight.objects.filter(search_id=search_id)
-        if len(flights) > limit:
-            flights = flights[:15]
-        elif not flights:
-            print("--- No flights found.")
+
+        if not flights:
             raise Exception("No flights found for given search_id.")
-        #print(f"--- {len(flights)} flights found, returning {limit}")
 
-        print("--- Creating flights_list")
+        unique_trip_ids = []
         flights_list = []
-        for f in flights:
-            # build a dict similar to how created_flights was constructed
-                flight_dict = {
-                    "trip_id": getattr(f, "trip_id", None),
-                    "departure_id": getattr(f, "departure_id", None),
-                    "departure_airport": getattr(f, "departure_airport", None),
-                    "departure_time": getattr(f, "departure_time", None),
-                    "arrival_id": getattr(f, "arrival_id", None),
-                    "arrival_time": getattr(f, "arrival_time", None),
-                    "arrival_airport": getattr(f, "arrival_airport", None),
-                    "arrival_date": getattr(f, "arrival_date", None),
-                    "duration": getattr(f, "duration", None),
-                    "airline_name": getattr(f, "airline_name", None),
-                    "airline_logo": getattr(f, "airline_logo", None),
-                    "type": getattr(f, "type", None),
-                    "price": getattr(f, "price", None),
-                    "outbound_date": getattr(f, "outbound_date", None),
-                    "travel_class": getattr(f, "travel_class", None),
-                }
-                flights_list.append(flight_dict)
 
-        print("--- flights_list created, returning now")
+        for f in flights:
+            if len(unique_trip_ids) >= limit:
+                break
+            flight_dict = {
+                "trip_id": getattr(f, "trip_id", None),
+                "departure_id": getattr(f, "departure_id", None),
+                "departure_airport": getattr(f, "departure_airport", None),
+                "departure_time": getattr(f, "departure_time", None),
+                "arrival_id": getattr(f, "arrival_id", None),
+                "arrival_time": getattr(f, "arrival_time", None),
+                "arrival_airport": getattr(f, "arrival_airport", None),
+                "arrival_date": getattr(f, "arrival_date", None),
+                "duration": getattr(f, "duration", None),
+                "airline_name": getattr(f, "airline_name", None),
+                "airline_logo": getattr(f, "airline_logo", None),
+                "type": getattr(f, "type", None),
+                "price": getattr(f, "price", None),
+                "outbound_date": getattr(f, "outbound_date", None),
+                "travel_class": getattr(f, "travel_class", None),
+            }
+            # Check if trip_id is already in unique_trip_ids, add it if not
+            trip_id = flight_dict.get("trip_id")
+            if trip_id not in unique_trip_ids:
+                unique_trip_ids.append(trip_id)
+            flights_list.append(flight_dict)
+
         return flights_list
 

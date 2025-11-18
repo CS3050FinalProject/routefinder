@@ -211,3 +211,7 @@ backend/.elasticbeanstalk/*
 
 # txt files from debugging
 serp_response.txt
+
+# aws cert stuff
+backend/*.key
+backend/*.cert
