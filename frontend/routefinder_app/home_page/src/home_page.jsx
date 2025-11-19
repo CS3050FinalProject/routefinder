@@ -1,23 +1,22 @@
 //imports
 
-import React, { useState } from "react";
+import React, {useState} from "react";
+import axios from "axios";
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
-import { Plane, TrainFront, Rat, Redo, BusFront } from "lucide-react";
-import { ReactComponent as RoutefinderLogo } from './images/Logo.svg';
+import {BusFront, Plane, Rat, Redo, TrainFront} from "lucide-react";
+import {ReactComponent as RoutefinderLogo} from './images/Logo.svg';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {FormGroup} from "react-bootstrap";
 
 
-  const isValidateText = (value) => {
+const isValidateText = (value) => {
       const regex = /^[A-Za-z]+$/; // only English letters
-      const isValid = regex.test(value);
-
-      return isValid;
+  return regex.test(value);
 };
 
 
@@ -49,7 +48,8 @@ function TravelClassSelect() {
 }
 
 
-const DateRangeWithPortal = () => {
+
+const DateRangeWithPortal = ({ departureTime = new Date(), arrivalTime = new Date()}) => {
     // keep dateRange as a stateful array [startDate, endDate]
     const current = new Date();
     const date = `${current.getMonth()+1}/${current.getDate()}/${current.getFullYear()}`;
@@ -64,6 +64,9 @@ const DateRangeWithPortal = () => {
         endDate={endDate}
         onChange={(update) => {
           setDateRange(update);
+          /// need to make this work
+          departureTime = `${startDate.getFullYear()}/${startDate.getMonth()+1}/${startDate.getDate()}`;
+          arrivalTime =  `${endDate.getFullYear()}/${endDate.getMonth()+1}/${endDate.getDate()}`;
         }}
         selectsRange
         withPortal
@@ -72,11 +75,11 @@ const DateRangeWithPortal = () => {
     );
   };
 
-  function Form_Grid({ origin, setOrigin, destination, setDestination, handleSubmit }) {
+  function Form_Grid({ origin, setOrigin, destination, setDestination, departureTime,arrivalTime,handleSubmit }) {
   return (
     <Form onSubmit={handleSubmit}>
-      <Row>
-        <Col>
+      <Row className={"flex justify-center-safe pb-"}>
+        <Col className="p-0 m-0">
           <input
             type="text"
             placeholder="Origin Airport (e.g. JFK)"
@@ -85,10 +88,10 @@ const DateRangeWithPortal = () => {
             className="border rounded-lg p-2 w-64 text-center"
           />
         </Col>
-        <Col className="flex items-center justify-center">
-          <Redo />
+        <Col className={"p-0 m-0 arrow_col flex-initial"}>
+          <Redo className={" arrow"}/>
         </Col>
-        <Col>
+        <Col className="p-0 m-0">
           <input
             type="text"
             placeholder="Destination Airport (e.g. LAX)"
@@ -97,7 +100,7 @@ const DateRangeWithPortal = () => {
             className="border rounded-lg p-2 w-64 text-center"
           />
         </Col>
-        <Col>
+        <Col className="p-0 m-0">
           <Button variant="primary" type="submit">
             Find Routes
           </Button>
@@ -106,7 +109,9 @@ const DateRangeWithPortal = () => {
 
       <Row className="mt-3">
         <Col>
-          <DateRangeWithPortal />
+          <DateRangeWithPortal
+          departureTime={departureTime}
+          arrivalTime={arrivalTime}/>
         </Col>
         <Col>
           <TravelClassSelect />
@@ -119,10 +124,10 @@ const DateRangeWithPortal = () => {
   );
   }
 
-  {/* RouteCard
-  A function that takes data about the trip (I forgot what data we were using but this is easily expanded)
-  returns a card containing all that data formatted horizontally
-  I only return a a string of vehicleType rn because idk what images were putting here  */}
+  // RouteCard
+  // A function that takes data about the trip (I forgot what data we were using but this is easily expanded)
+  // returns a card containing all that data formatted horizontally
+  // I only return a a string of vehicleType rn because idk what images were putting here
 
   const RouteCard = ({ vehicleType, company, cost, layovers, showRoutes }) => {
   let IconComponent;
@@ -164,10 +169,9 @@ const DateRangeWithPortal = () => {
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
   const [routes, setRoutes] = useState([]);
+  const [departureTime] = useState([]);
+  const [arrivalTime] = useState([]);
   const [showRoutes, setShowRoutes] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [responsePreview, setResponsePreview] = useState(null);
 
 
 
@@ -188,86 +192,46 @@ const DateRangeWithPortal = () => {
   ];
 
 
-// Updated handleSubmit that uses getTestJson
 const handleSubmit = async (e) => {
   e.preventDefault();
 
+  if(!isValidateText(origin)){
+     alert('Your origin airport should just only be letters. For example: "IAD" or "SFO"');
+    return;
+  }
   if (!origin || !destination) {
     alert("Please enter both origin and destination airports.");
     return;
   }
 
-  const endpoint = "http://routefinder-api-env-prod.eba-egdm2f3j.us-east-1.elasticbeanstalk.com/flights/search/";
+  // const proxy = 'https://api.allorigins.win/get'
+  const formData = new FormData(e.target)
+  const formDataObj = Object.fromEntries(formData.entries())
+  const targetUrl = 'http://routefinder-api-env-prod.eba-egdm2f3j.us-east-1.elasticbeanstalk.com/flights/search/?' +
+  new URLSearchParams({
+    departure_id: origin,
+    arrival_id:   destination,
+    hl:           "en",
+    outbound_date: departureTime,
+    return_date:  arrivalTime,
+    currency:     "USD",
+    format:       "json"
+  }).toString();
 
-  setLoading(true);
-  setError(null);
-  setResponsePreview(null);
+  axios.get('https://api.allorigins.win/get', { params: { url: targetUrl } })
+    .then(response => {
+    const all_response = response.data.contents;
+    try {
+      const json_response = JSON.parse(all_response);
 
-  try {
-    const params = {
-    departure_id: "PEK",
-    arrival_id: "AUS",
-    // "gl": "us",
-    hl: "en",
-    // "type": 1,
-    outbound_date: "2025-11-14",
-    return_date: "2025-11-16",
-    // "travel_class": 1,
-    // "exclude_basic": false,
-    currency: "USD",
-    // "deep_search": false
-    };
-
-    const url = new URL(endpoint);
-    Object.entries(params).forEach(([k, v]) => url.searchParams.append(k, v));
-
-    console.log("Fetching:", url.toString());
-
-    const res = await fetch(url.toString(), {
-      method: "GET",
-      headers: {
-        "Accept": "application/json, text/plain, */*",
-      },
-    });
-
-    if (!res.ok) {
-      throw new Error(`Request failed: ${res.status} ${res.statusText}`);
+      console.log('Parsed proxied JSON:', json_response);
+    } catch (e) {
+      console.log('Proxied text (not JSON):', all_response);
     }
-
-    const contentType = res.headers.get("content-type") || "";
-    const data = contentType.includes("application/json")
-      ? await res.json()
-      : await res.text();
-
-    console.log("API response:", data);
-    setResponsePreview(
-      typeof data === "string"
-        ? data.slice(0, 500)
-        : JSON.stringify(data, null, 2)
-    );
-
-    //should map it to a Route
-    if (data && Array.isArray(data.results)) {
-      const mappedRoutes = data.results.map((r, idx) => ({
-        id: r.id ?? idx,
-        vehicleType: r.transport ?? "plane",
-        company: r.carrier_name ?? r.operator ?? "Unknown",
-        cost: r.price ?? r.fare ?? "N/A",
-        layovers: Array.isArray(r.stops) ? r.stops : [],
-      }));
-      setRoutes(mappedRoutes);
-      setShowRoutes(true);
-    } else {
-      console.warn("No valid results array, showing dummy routes instead");
-      setRoutes(dummyRoutes);
-      setShowRoutes(true);
-    }
-  } catch (err) {
-    console.error("Fetch error:", err);
-    setError(err.message || "Unknown error occurred");
-  } finally {
-    setLoading(false);
-  }
+  })
+  .catch(err => {
+    console.error('Request failed:', err.message);
+  });
 };
 
 
@@ -277,7 +241,7 @@ const handleSubmit = async (e) => {
     <div className="min-h-screen flex justify-center items-center bg-slate-50 text-gray-800 p-6">
       <div className="w-full max-w-2xl flex flex-col items-center text-center">
         <header className={""}>
-          <a href={'http://localhost:3000'}>
+          <a href={'https://main.d3oqjx740ps4dp.amplifyapp.com'}>
             <RoutefinderLogo width={200} height={200} className="mt-4"/>
           </a>
            <Form_Grid
@@ -285,21 +249,14 @@ const handleSubmit = async (e) => {
             setOrigin={setOrigin}
             destination={destination}
             setDestination={setDestination}
+            departureTime={departureTime}
+            arrivalTime={arrivalTime}
             handleSubmit={handleSubmit}
           />
 
 
         </header>
 
-        {loading && <p>Loading…</p>}
-
-        {error && <p className="text-red-600">Error: {error}</p>}
-
-        {responsePreview && (
-          <pre className="bg-gray-100 p-3 rounded text-left overflow-auto whitespace-pre-wrap max-h-80">
-            {responsePreview}
-          </pre>
-        )}
 
         {routes.length > 0 && (
             <div className="flex flex-col items-center mt-8 w-full">
