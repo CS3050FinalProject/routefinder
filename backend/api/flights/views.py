@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.core import serializers
+from django.core import management
 
 from .models import Flight
 from .serializers import FlightSerializer
@@ -37,6 +38,9 @@ class FlightSearchView(APIView):
         in db and was made previously, returns those search results.
         Otherwise it queries serpapi and returns new search data.
         """
+
+        print(">>> views debugging <<<")
+        management.call_command('db_sweeper')  # Call the db_sweeper command to clean old searches
 
         api_key = os.environ.get("SERP_API_KEY") # the api key is in the elastic beanstalk
         if not api_key:
