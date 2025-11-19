@@ -31,18 +31,13 @@ h1 {
   color: white;
 }
 
-
-.arrow {
-  width: 25%;
-  height: 25%;
-  min-width: 2.5em;
-  min-height: 2.5em;
-  padding-bottom: 3%;
-  margin-left: 0;
+.arrow_col{
+  align-content: center;
 }
-
+svg.arrow{
+  display: inline;
+}
 input[type=text]{
-  width: 50%;
   padding: 1em;
   margin: 2% 1%;
   display: inline-block;
@@ -76,6 +71,13 @@ input[type=text]{
   transform: translateY(0);
 }
 
+.topFormRow{
+  display: flex;
+
+  margin-bottom: 0;
+  margin-top: 0;
+
+}
 .companyName{
   display:flex;
   align-items: center

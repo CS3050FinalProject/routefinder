@@ -23,12 +23,23 @@ const isValidateText = (value) => {
 
 
 
-  function DirectSwitch() {
+  function DirectSwitch(roundTrip, setRoundTrip) {
+    const handleChange = (e) => {
+    if(e.target.checked){
+      setRoundTrip(1);
+    }
+    else{
+      setRoundTrip(2);
+    }
+  };
   return (
       <Form.Check
         type="switch"
+        name = "RoundTripSwitch"
         id="RoundTripSwitch"
         label="Round Trip?"
+        checked={roundTrip === 2}
+        onChange={handleChange}
       />
   );
 }
@@ -60,6 +71,7 @@ const DateRangeWithPortal = ({ departureTime = new Date(), arrivalTime = new Dat
     return (
       <DatePicker
         selected={startDate}
+        required={true}
         startDate={startDate}
         endDate={endDate}
         onChange={(update) => {
@@ -75,32 +87,34 @@ const DateRangeWithPortal = ({ departureTime = new Date(), arrivalTime = new Dat
     );
   };
 
-  function Form_Grid({ origin, setOrigin, destination, setDestination, departureTime,arrivalTime,handleSubmit }) {
+  function Form_Grid({ origin, setOrigin, destination, setDestination, departureTime,arrivalTime,roundTrip,setRoundTrip,handleSubmit }) {
   return (
     <Form onSubmit={handleSubmit}>
-      <Row className={"flex justify-center-safe pb-"}>
-        <Col className="p-0 m-0">
+      <Row className={"justify-stretch m-2 topFormRow"}>
+        <Col className="ml-2 p-0 m-0">
           <input
             type="text"
             placeholder="Origin Airport (e.g. JFK)"
             value={origin}
-            onChange={(e) => setOrigin(e.target.value)}
+            required={true}
+            onChange={(e) => setOrigin(e.target.value.toUpperCase())}
             className="border rounded-lg p-2 w-64 text-center"
           />
         </Col>
-        <Col className={"p-0 m-0 arrow_col flex-initial"}>
+        <Col className={"p-0 m-0 arrow_col"}>
           <Redo className={" arrow"}/>
         </Col>
         <Col className="p-0 m-0">
           <input
             type="text"
+            required={true}
             placeholder="Destination Airport (e.g. LAX)"
             value={destination}
-            onChange={(e) => setDestination(e.target.value)}
+            onChange={(e) => setDestination(e.target.value.toUpperCase())}
             className="border rounded-lg p-2 w-64 text-center"
           />
         </Col>
-        <Col className="p-0 m-0">
+        <Col className="p-0 m-0 submit_button">
           <Button variant="primary" type="submit">
             Find Routes
           </Button>
@@ -117,7 +131,10 @@ const DateRangeWithPortal = ({ departureTime = new Date(), arrivalTime = new Dat
           <TravelClassSelect />
         </Col>
         <Col>
-          <DirectSwitch />
+          <DirectSwitch
+          roundTrip = {roundTrip}
+          setRoundTrip = {setRoundTrip}
+          />
         </Col>
       </Row>
     </Form>
@@ -169,6 +186,7 @@ const DateRangeWithPortal = ({ departureTime = new Date(), arrivalTime = new Dat
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
   const [routes, setRoutes] = useState([]);
+  const [roundTrip, setRoundTrip] = useState(1); // one way on start
   const [departureTime] = useState([]);
   const [arrivalTime] = useState([]);
   const [showRoutes, setShowRoutes] = useState(false);
@@ -195,12 +213,22 @@ const DateRangeWithPortal = ({ departureTime = new Date(), arrivalTime = new Dat
 const handleSubmit = async (e) => {
   e.preventDefault();
 
+
   if(!isValidateText(origin)){
      alert('Your origin airport should just only be letters. For example: "IAD" or "SFO"');
     return;
   }
+    if(!isValidateText(destination)){
+     alert('Your destination airport should just only be letters. For example: "IAD" or "SFO"');
+    return;
+  }
+
   if (!origin || !destination) {
     alert("Please enter both origin and destination airports.");
+    return;
+  }
+  if ((!(roundTrip == 2))&&(!(roundTrip == 1))){
+    alert("Something is wrong with the Round trip Switch. Please try again!");
     return;
   }
 
@@ -212,10 +240,13 @@ const handleSubmit = async (e) => {
     departure_id: origin,
     arrival_id:   destination,
     hl:           "en",
-    outbound_date: departureTime,
-    return_date:  arrivalTime,
+    outbound_date:"2025-12-14",
+    return_date:  "2025-12-16",
+    // outbound_date: departureTime,
+    // return_date:  arrivalTime,
     currency:     "USD",
-    format:       "json"
+    format:       "json",
+    type: roundTrip //one way flight
   }).toString();
 
   axios.get('https://api.allorigins.win/get', { params: { url: targetUrl } })
@@ -223,8 +254,11 @@ const handleSubmit = async (e) => {
     const all_response = response.data.contents;
     try {
       const json_response = JSON.parse(all_response);
-
+      const responses = JSON.parse(json_response);
       console.log('Parsed proxied JSON:', json_response);
+      console.log(responses.Trips.length);
+      setRoutes(dummyRoutes);
+      setTimeout(() => setShowRoutes(true), 1000);
     } catch (e) {
       console.log('Proxied text (not JSON):', all_response);
     }
@@ -251,6 +285,8 @@ const handleSubmit = async (e) => {
             setDestination={setDestination}
             departureTime={departureTime}
             arrivalTime={arrivalTime}
+            roundTrip={roundTrip}
+            setRoundTrip = {setRoundTrip}
             handleSubmit={handleSubmit}
           />
 
