@@ -24,8 +24,8 @@ def get_test(endpoint):
 
 
 if __name__ == "__main__":
-    endpoint = "http://routefinder-api-env-prod.eba-egdm2f3j.us-east-1.elasticbeanstalk.com/flights/search/"
-    #endpoint = 'http://0.0.0.0:8000/flights/search'
+    #endpoint = "http://routefinder-api-env-prod.eba-egdm2f3j.us-east-1.elasticbeanstalk.com/flights/search/"
+    endpoint = 'http://127.0.0.1:8000/flights/search'
     #post_test(endpoint)
     get_test(endpoint)
 
