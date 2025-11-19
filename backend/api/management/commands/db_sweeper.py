@@ -2,6 +2,7 @@
 Python script for cleaning database of old searches and flights.
 old: object created >= 1 hour ago
 """
+from time import sleep
 from api.searches.models import Search
 from django.core.management.base import BaseCommand
 from django.utils import timezone

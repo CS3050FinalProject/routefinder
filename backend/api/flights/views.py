@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.core import serializers
+from django.core import management
 
 from .models import Flight
 from .serializers import FlightSerializer
@@ -28,7 +29,7 @@ class FlightSearchView(APIView):
     Must set SERPAPI_API_KEY in environment.
     """
     SERPAPI_URL = "https://serpapi.com/search.json"
-    ALLOWED_PARAMS = {"departure_id", "arrival_id", "outbound_date", "return_date", "currency"}
+    ALLOWED_PARAMS = {"departure_id", "arrival_id", "outbound_date", "return_date", "currency", "type"}
 
     def get(self, request):
         """
@@ -39,6 +40,8 @@ class FlightSearchView(APIView):
         """
 
         print(">>> views debugging <<<")
+        management.call_command('db_sweeper')  # Call the db_sweeper command to clean old searches
+
         api_key = os.environ.get("SERP_API_KEY") # the api key is in the elastic beanstalk
         if not api_key:
             return Response({"irror": "SERP_API_KEY not configured"},
@@ -76,13 +79,10 @@ class FlightSearchView(APIView):
             try:
                 r = requests.get(self.SERPAPI_URL, params=params, timeout=15)
                 r.raise_for_status()
-                print(">>> SerpAPI request successful")
                 # If not found, create a new Search entry
-                print(">>> Saving search")
                 SearchSerializer.save_search(
                     {"search_id": search_id, "search_datetime": datetime.datetime.now()}
                 )
-                print(">>> Search saved")
             except requests.RequestException as exc:
                 logger.exception("SerpAPI request failed")
                 return Response({"error": "SerpAPI request failed",
@@ -91,7 +91,6 @@ class FlightSearchView(APIView):
 
             # forward status code and JSON (or text if non-JSON)
             try:
-                print(">>> Parsing SERP query json")
                 data = r.json()
 
                 # Save serp response to file for debugging
@@ -110,24 +109,18 @@ class FlightSearchView(APIView):
                                     "text": r.text[:200]},
                                     status=status.HTTP_502_BAD_GATEWAY)
 
-                print(">>> Calling flights_to_save")
                 if best_flights:
                     flights_to_save = parse_flights_json(best_flights, search_id)
-                    print(">>> Saving best flights")
                     FlightSerializer.save_flights(data=flights_to_save)
-                    print(">>> Flights saved")
                 if other_flights:
                     flights_to_save = parse_flights_json(other_flights, search_id)
-                    print(">>> Saving other flights")
                     FlightSerializer.save_flights(data=flights_to_save)
-                    print(">>> Flights saved")
 
             except ValueError:
                 return Response({"error": "SerpAPI returned non-JSON",
                                  "text": r.text[:200]},
                                  status=status.HTTP_502_BAD_GATEWAY)
         #print("checkpoint")
-        print(">>> Getting flights by search_id")
         try:
             get_flights_by_search_id = FlightSerializer.get_flights_by_search_id(search_id)
         except Exception as e:
