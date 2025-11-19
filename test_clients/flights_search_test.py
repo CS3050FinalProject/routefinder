@@ -12,12 +12,12 @@ def get_test(endpoint):
         #"gl": "us",
         "hl": "en",
         "type": 2,
-        "outbound_date": "2025-12-15",
+        "outbound_date": "2025-12-17",
         "return_date": "2025-12-19",
         #"travel_class": 1,
         #"exclude_basic": False,
         "currency": "USD",
-        "type": 1 #one way flight
+        "type": 2 #one way flight
     })
     data = get_response.json()
     print(data)
