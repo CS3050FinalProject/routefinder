@@ -223,35 +223,6 @@ const handleSubmit = async (e) => {
   .catch(err => {
     console.error('Request failed:', err.message);
   });
-
-// const targetUrl = 'http://routefinder-api-env-prod.eba-egdm2f3j.us-east-1.elasticbeanstalk.com/flights/search/?' +
-//   new URLSearchParams({
-//     departure_id: "PEK",
-//     arrival_id:   "AUS",
-//     hl:           "en",
-//     outbound_date:"2025-12-14",
-//     return_date:  "2025-12-16",
-//     currency:     "USD",
-//     format:       "json"
-//   }).toString();
-//
-// // AllOrigins expects ?url=<full_target_url>
-// axios.get('https://api.allorigins.win/get', { params: { url: targetUrl } })
-//   .then(response => {
-//     // allorigins returns an object like { contents: "<raw-response>", status: { ... } }
-//     // If the proxied response is JSON you need to parse the contents string:
-//     const proxiedText = response.data.contents;
-//     try {
-//       const proxiedJson = JSON.parse(proxiedText);
-//       console.log('Parsed proxied JSON:', proxiedJson);
-//     } catch (e) {
-//       console.log('Proxied text (not JSON):', proxiedText);
-//     }
-//   })
-//   .catch(err => {
-//     console.error('Request failed:', err.message);
-//   });
-
 };
 
 
