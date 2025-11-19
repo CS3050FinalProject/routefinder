@@ -1,6 +1,7 @@
 //imports
 
 import React, { useState } from "react";
+import axios from "axios";
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
@@ -75,8 +76,8 @@ const DateRangeWithPortal = () => {
   function Form_Grid({ origin, setOrigin, destination, setDestination, handleSubmit }) {
   return (
     <Form onSubmit={handleSubmit}>
-      <Row>
-        <Col>
+      <Row className={"flex justify-center-safe pb-"}>
+        <Col className="p-0 m-0">
           <input
             type="text"
             placeholder="Origin Airport (e.g. JFK)"
@@ -85,10 +86,10 @@ const DateRangeWithPortal = () => {
             className="border rounded-lg p-2 w-64 text-center"
           />
         </Col>
-        <Col className="flex items-center justify-center">
-          <Redo />
+        <Col className={"p-0 m-0 arrow_col flex-initial"}>
+          <Redo className={" arrow"}/>
         </Col>
-        <Col>
+        <Col className="p-0 m-0">
           <input
             type="text"
             placeholder="Destination Airport (e.g. LAX)"
@@ -97,7 +98,7 @@ const DateRangeWithPortal = () => {
             className="border rounded-lg p-2 w-64 text-center"
           />
         </Col>
-        <Col>
+        <Col className="p-0 m-0">
           <Button variant="primary" type="submit">
             Find Routes
           </Button>
@@ -197,77 +198,31 @@ const handleSubmit = async (e) => {
     return;
   }
 
-  const endpoint = "http://routefinder-api-env-prod.eba-egdm2f3j.us-east-1.elasticbeanstalk.com/flights/search/";
-
-  setLoading(true);
-  setError(null);
-  setResponsePreview(null);
-
-  try {
-    const params = {
+  // const proxy = 'https://api.allorigins.win/get'
+  const targetUrl = 'http://routefinder-api-env-prod.eba-egdm2f3j.us-east-1.elasticbeanstalk.com/flights/search/?' +
+  new URLSearchParams({
     departure_id: "PEK",
-    arrival_id: "AUS",
-    // "gl": "us",
-    hl: "en",
-    // "type": 1,
-    outbound_date: "2025-11-14",
-    return_date: "2025-11-16",
-    // "travel_class": 1,
-    // "exclude_basic": false,
-    currency: "USD",
-    // "deep_search": false
-    };
+    arrival_id:   "AUS",
+    hl:           "en",
+    outbound_date:"2025-12-14",
+    return_date:  "2025-12-16",
+    currency:     "USD",
+    format:       "json"
+  }).toString();
 
-    const url = new URL(endpoint);
-    Object.entries(params).forEach(([k, v]) => url.searchParams.append(k, v));
-
-    console.log("Fetching:", url.toString());
-
-    const res = await fetch(url.toString(), {
-      method: "GET",
-      headers: {
-        "Accept": "application/json, text/plain, */*",
-      },
-    });
-
-    if (!res.ok) {
-      throw new Error(`Request failed: ${res.status} ${res.statusText}`);
+  axios.get('https://api.allorigins.win/get', { params: { url: targetUrl } })
+    .then(response => {
+    const all_response = response.data.contents;
+    try {
+      const json_response = JSON.parse(all_response);
+      console.log('Parsed proxied JSON:', json_response);
+    } catch (e) {
+      console.log('Proxied text (not JSON):', all_response);
     }
-
-    const contentType = res.headers.get("content-type") || "";
-    const data = contentType.includes("application/json")
-      ? await res.json()
-      : await res.text();
-
-    console.log("API response:", data);
-    setResponsePreview(
-      typeof data === "string"
-        ? data.slice(0, 500)
-        : JSON.stringify(data, null, 2)
-    );
-
-    //should map it to a Route
-    if (data && Array.isArray(data.results)) {
-      const mappedRoutes = data.results.map((r, idx) => ({
-        id: r.id ?? idx,
-        vehicleType: r.transport ?? "plane",
-        company: r.carrier_name ?? r.operator ?? "Unknown",
-        cost: r.price ?? r.fare ?? "N/A",
-        layovers: Array.isArray(r.stops) ? r.stops : [],
-      }));
-      setRoutes(mappedRoutes);
-      setShowRoutes(true);
-    } else {
-      console.warn("No valid results array, showing dummy routes instead");
-      setRoutes(dummyRoutes);
-      setShowRoutes(true);
-    }
-  } catch (err) {
-    console.error("Fetch error:", err);
-    setError(err.message || "Unknown error occurred");
-  } finally {
-    setLoading(false);
-  }
+  })
+  .catch(err => {
+    console.error('Request failed:', err.message);
+  });
 };
 
 
