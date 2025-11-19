@@ -41,6 +41,7 @@ class FlightSearchView(APIView):
 
         print(">>> views debugging <<<")
         management.call_command('db_sweeper')  # Call the db_sweeper command to clean old searches
+        print(">>> db sweeped")
 
         api_key = os.environ.get("SERP_API_KEY") # the api key is in the elastic beanstalk
         if not api_key:
@@ -112,6 +113,7 @@ class FlightSearchView(APIView):
                 if best_flights:
                     flights_to_save = parse_flights_json(best_flights, search_id)
                     FlightSerializer.save_flights(data=flights_to_save)
+                    print("Saved best flights")
                 if other_flights:
                     flights_to_save = parse_flights_json(other_flights, search_id)
                     FlightSerializer.save_flights(data=flights_to_save)
@@ -154,6 +156,7 @@ class FlightSearchView(APIView):
                 "airline_logo": f.get("airline_logo")
             })
 
+        print("trips_map", trips_map)
         trips = list(trips_map.values())
         flights_dict = {"Trips": trips}
         flights = json.dumps(flights_dict, indent=2)
