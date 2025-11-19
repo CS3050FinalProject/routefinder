@@ -40,7 +40,13 @@ class FlightSearchView(APIView):
         """
 
         print(">>> views debugging <<<")
-        management.call_command('db_sweeper')  # Call the db_sweeper command to clean old searches
+        try:
+            management.call_command('db_sweeper')
+            print("db_sweeper executed")
+        except Exception as e:
+            print("db_sweeper skipped:", e)
+        
+
         api_key = os.environ.get("SERP_API_KEY") # the api key is in the elastic beanstalk
         if not api_key:
             return Response({"irror": "SERP_API_KEY not configured"},
