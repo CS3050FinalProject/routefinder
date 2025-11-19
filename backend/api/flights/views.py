@@ -28,7 +28,7 @@ class FlightSearchView(APIView):
     Must set SERPAPI_API_KEY in environment.
     """
     SERPAPI_URL = "https://serpapi.com/search.json"
-    ALLOWED_PARAMS = {"departure_id", "arrival_id", "outbound_date", "return_date", "currency"}
+    ALLOWED_PARAMS = {"departure_id", "arrival_id", "outbound_date", "return_date", "currency", "type"}
 
     def get(self, request):
         """
