@@ -30,6 +30,7 @@ class FlightSearchView(APIView):
     """
     SERPAPI_URL = "https://serpapi.com/search.json"
     ALLOWED_PARAMS = {"departure_id", "arrival_id", "outbound_date", "return_date", "currency", "type"}
+    REQUIRED_PARAMS = {"departure_id", "arrival_id", "outbound_date"}
 
     def get(self, request):
         """
@@ -38,26 +39,62 @@ class FlightSearchView(APIView):
         the db, return those search results. Otherwise query SerpAPI
         and store those new results before returning.
         """
-
         print(">>> views debugging <<<")
+        # Clean database of old searches
         try:
             management.call_command('db_sweeper')
             print("db_sweeper executed")
         except Exception as e:
             print("db_sweeper skipped:", e)
-        
 
-        api_key = os.environ.get("SERP_API_KEY") # the api key is in the elastic beanstalk
+        # Check for api key
+        api_key = os.environ.get("SERP_API_KEY") # api key in eb environment
         if not api_key:
-            return Response({"irror": "SERP_API_KEY not configured"},
+            return Response({"error": "SERP_API_KEY not configured"},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        print("WARNING: IS YOUR SUPABASE URL KEY CONFIGURED FOR LOCAL ENVIRONMENT?")
 
-        # copy permitted query params
+        # Copy permitted query params
         params = {}
         for k, v in request.query_params.items():
             if k in self.ALLOWED_PARAMS:
                 params[k] = v
+
+
+        # TODO: Implement logic to check if user is searching for direct or
+        # round trip flights. Filter out potentially unnecessary parameters.
+
+        # Return an error if required parameters are missing
+        if not REQUIRED_PARAMS.issubset(set(params))
+            cp_required = REQUIRED_PARAMS.copy()
+            cp_required.-=set(params)
+            return Response({"error": f"Missing params: {cp_required}"}
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # Check for user specified flight type and filter passed parameters accordingly
+        if "type" in params.keys():
+            trip_type = params.get("type")
+        else:
+            trip_type = 2
+
+        """
+        NOTE: We may want to move logic for querying serpapi inside
+        this match-case statement to avoid using a large if else statement
+        checking the trip type later in the code. Alternatively we can move
+        the code to query serpapi to a function in the services file the way
+        we did with the code to parse the json. We may want to do that regardless
+        to avoid duplicating the query code for return flights since we will need
+        to make two queries to serp.
+        """
+        match trip_type:
+            case 1:
+                if params.get("return_date") == None:
+                    return Resonse({"error": "No return date specified for round trip search."}
+                                   status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            case 2:
+                if params.get("return_date") != None:
+                    del params["return_date"]
+            case _:
+                return Response({"error": "Invalid flight type passed."},
+                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # generate unique search ID
         search_id = generate_unique_search_id(params.get("departure_id", ""),
