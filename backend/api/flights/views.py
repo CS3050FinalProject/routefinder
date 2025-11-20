@@ -2,7 +2,6 @@
 Flight views.
 """
 import os
-import datetime
 from asyncio.log import logger
 import json
 
@@ -17,7 +16,7 @@ from .models import Flight
 from .serializers import FlightSerializer
 from api.searches.serializers import SearchSerializer
 from api.searches.models import Search
-from .services import generate_unique_search_id, generate_unique_trip_id, parse_flights_json
+from .services import generate_unique_search_id, search_for_flights
 
 
 class FlightSearchView(APIView):
@@ -41,11 +40,11 @@ class FlightSearchView(APIView):
         """
         print(">>> views debugging <<<")
         # Clean database of old searches
-        try:
-            management.call_command('db_sweeper')
-            print("db_sweeper executed")
-        except Exception as e:
-            print("db_sweeper skipped:", e)
+        # try:
+        #     management.call_command('db_sweeper')
+        #     print("db_sweeper executed")
+        # except Exception as e:
+        #     print("db_sweeper skipped:", e)
 
         # Check for api key
         api_key = os.environ.get("SERP_API_KEY") # api key in eb environment
@@ -64,16 +63,20 @@ class FlightSearchView(APIView):
         # round trip flights. Filter out potentially unnecessary parameters.
 
         # Return an error if required parameters are missing
-        if not REQUIRED_PARAMS.issubset(set(params))
-            cp_required = REQUIRED_PARAMS.copy()
-            cp_required.-=set(params)
-            return Response({"error": f"Missing params: {cp_required}"}
+        if not self.REQUIRED_PARAMS.issubset(set(params)):
+            cp_required = self.REQUIRED_PARAMS.copy()
+            cp_required -= set(params)
+            return Response({"error": f"Missing params: {cp_required}"},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        print(">>> Setting trip type <<<")
         # Check for user specified flight type and filter passed parameters accordingly
+        # 1 - Round trip (default)
+        # 2 - One way
         if "type" in params.keys():
-            trip_type = params.get("type")
+            trip_type = int(params.get("type"))
         else:
-            trip_type = 2
+            trip_type = 1  # Default to round trip
 
         """
         NOTE: We may want to move logic for querying serpapi inside
@@ -87,7 +90,7 @@ class FlightSearchView(APIView):
         match trip_type:
             case 1:
                 if params.get("return_date") == None:
-                    return Resonse({"error": "No return date specified for round trip search."}
+                    return Response({"error": "No return date specified for round trip search."},
                                    status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             case 2:
                 if params.get("return_date") != None:
@@ -95,110 +98,46 @@ class FlightSearchView(APIView):
             case _:
                 return Response({"error": "Invalid flight type passed."},
                                 status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+        #Set boolean for round trip
+        if trip_type == 1:
+            is_round_trip = True
+        else:   
+            is_round_trip = False
 
-        # generate unique search ID
-        search_id = generate_unique_search_id(params.get("departure_id", ""),
-                                              params.get("arrival_id", ""),
-                                              params.get("outbound_date", ""),
-                                              params.get("return_date", ""))
-        print(">>> search_id generated")
+        # generate unique search ID for outbound flight
+        search_id = generate_unique_search_id(params.get("departure_id"),
+                                              params.get("arrival_id"),
+                                              params.get("outbound_date"))
+        if is_round_trip:
+            # generate unique search ID for return flight
+            return_search_id = generate_unique_search_id(params.get("arrival_id"),
+                                                         params.get("departure_id"),
+                                                         params.get("return_date"))
+        
+        print(">>> search_id generated <<<")
 
         # enforce engine and api_key
         params["engine"] = "google_flights"
         params["api_key"] = api_key
         params["multi_city_json"] = "true"
 
-        # Search Database for existing searches
-        print(">>> Checking for previous matching searches")
-        existing_search = Search.objects.filter(search_id=search_id).first()
-        if existing_search:
-            print(">>> Existing search found")
-        else:
-            print(">>> No existing search found")
+        outbound_flights_dict = search_for_flights(self, params, search_id)
+        flights_dict = {}
+        flights_dict["outbound_trips"] = outbound_flights_dict
+        if is_round_trip:
+            return_params = params.copy()
+            # swap departure and arrival for return flight
+            return_params["departure_id"] = params.get("arrival_id")
+            return_params["arrival_id"] = params.get("departure_id")
+            return_params["outbound_date"] = params.get("return_date")
+            # remove return date for return flight search
+            del return_params["return_date"]
+            return_flights_dict = search_for_flights(self, return_params, return_search_id)
+            flights_dict["return_trips"] = return_flights_dict
 
-        # make request to SerpAPI if not existing search
-        if not existing_search:
-            try:
-                r = requests.get(self.SERPAPI_URL, params=params, timeout=15)
-                r.raise_for_status()
-                print(">>> SerpAPI request successful")
-                # If not found, create a new Search entry
-                print(">>> Saving search")
-                SearchSerializer.save_search(
-                    {"search_id": search_id, "search_datetime": datetime.datetime.now()}
-                )
-            except requests.RequestException as exc:
-                logger.exception("SerpAPI request failed")
-                return Response({"error": "SerpAPI request failed",
-                                 "detail": str(exc)},
-                                status=status.HTTP_502_BAD_GATEWAY)
-
-            # forward status code and JSON (or text if non-JSON)
-            try:
-                data = r.json()
-
-                # Save serp response to file for debugging
-                #with open('serp_response.txt', 'w') as f:
-                #    f.write(json.dumps(data, indent=2))
-
-                # Extract list of itineraries (adjust key if SerpAPI response uses a different one)
-                best_flights = data.get("best_flights") or None
-                other_flights = data.get("other_flights") or None
-                #print(f">>> Flight data: \nbest_flights: {best_flights}\nother_flights: {other_flights}")
-                try:
-                    if not best_flights and not other_flights:
-                        raise ValueError
-                except ValueError:
-                    return Response({"error": "SerpAPI returned non-parseable JSON",
-                                    "text": r.text[:200]},
-                                    status=status.HTTP_502_BAD_GATEWAY)
-
-                if best_flights:
-                    flights_to_save = parse_flights_json(best_flights, search_id)
-                    FlightSerializer.save_flights(data=flights_to_save)
-                if other_flights:
-                    flights_to_save = parse_flights_json(other_flights, search_id)
-                    FlightSerializer.save_flights(data=flights_to_save)
-
-            except ValueError:
-                return Response({"error": "SerpAPI returned non-JSON",
-                                 "text": r.text[:200]},
-                                 status=status.HTTP_502_BAD_GATEWAY)
-        #print("checkpoint")
-        try:
-            get_flights_by_search_id = FlightSerializer.get_flights_by_search_id(search_id)
-        except Exception as e:
-            print(e)
-            return Response({"error": "There are no saved flights for this search"},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        # group flights by trip_id into trips, preserving insertion order
-        trips_map = {}
-        for f in get_flights_by_search_id:
-            tid = f.get("trip_id")
-            if tid not in trips_map:
-                trips_map[tid] = {
-                    "price": f.get("price"),
-                    "type": f.get("type"),
-                    "travel_class": f.get("travel_class"),
-                    "flights": [],
-                }
-            # append flight leg (keep the same field shape as stored)
-            trips_map[tid]["flights"].append({
-                "departure_id": f.get("departure_id"),
-                "departure_airport": f.get("departure_airport"),
-                "departure_time": f.get("departure_time"),
-                "outbound_date": f.get("outbound_date"),
-                "arrival_id": f.get("arrival_id"),
-                "arrival_airport": f.get("arrival_airport"),
-                "arrival_time": f.get("arrival_time"),
-                "arrival_date": f.get("arrival_date"),
-                "duration": f.get("duration"),
-                "airline_name": f.get("airline_name"),
-                "airline_logo": f.get("airline_logo")
-            })
-
-        trips = list(trips_map.values())
-        flights_dict = {"Trips": trips}
-        flights = json.dumps(flights_dict, indent=2)
-        return Response(flights, status=status.HTTP_200_OK)
+        print(">>> returning response <<<")
+        #dump flights to json and return response
+        # flights = json.dumps(flights_dict, indent=4)
+        # print(flights)
+        return Response(flights_dict, status=status.HTTP_200_OK)
