@@ -33,10 +33,10 @@ class FlightSearchView(APIView):
 
     def get(self, request):
         """
-        Retrieves flight information from serpapi and checks for
-        recent identical searches stored in db. If search exists 
-        in db and was made previously, returns those search results.
-        Otherwise it queries serpapi and returns new search data.
+        Retrieves flight information from database. If an identical
+        search exists was made recently and results for it exist in
+        the db, return those search results. Otherwise query SerpAPI
+        and store those new results before returning.
         """
 
         print(">>> views debugging <<<")
