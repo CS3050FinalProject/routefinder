@@ -120,47 +120,6 @@ const DateRangeWithPortal = () => {
   );
   }
 
-  {/* RouteCard
-  A function that takes data about the trip (I forgot what data we were using but this is easily expanded)
-  returns a card containing all that data formatted horizontally
-  I only return a a string of vehicleType rn because idk what images were putting here  */}
-
-  const RouteCard = ({ vehicleType, company, cost, layovers, showRoutes }) => {
-  let IconComponent;
-
-  // Pick which icon to use
-  switch (vehicleType.toLowerCase()) {
-    case "plane":
-      IconComponent = Plane;
-      break;
-    case "train":
-      IconComponent = TrainFront;
-      break;
-    case "bus":
-      IconComponent = BusFront;
-      break;
-    default:
-      IconComponent = Rat; // fallback icon
-      break;
-  }
-
-  const classes = `route fade-in flex justify-center border border-gray-200 rounded-xl p-4 mb-3 bg-white shadow hover:shadow-md transition w-full max-w-3xl ${showRoutes ? "show" : ""}`;
-
-  return (
-    <div className={classes} >
-      <div className="companyName font-semibold text-blue-700">
-        <IconComponent className="w-5 h-5 text-gray-600" /><p>{company}</p>
-        </div>
-        <p className="font-medium">Cost = ${cost}</p>
-        {layovers.length > 0 ? (
-        <p>Layovers: ({layovers.join(", ")})</p>
-        ) : (
-        <p>Direct</p>
-        )}
-    </div>
-  );
-};
-
   export default function AirportRoutes() {
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
@@ -169,6 +128,62 @@ const DateRangeWithPortal = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [responsePreview, setResponsePreview] = useState(null);
+
+  {/* RouteCard
+  A function that takes data about the trip (I forgot what data we were using but this is easily expanded)
+  returns a card containing all that data formatted horizontally
+  I only return a a string of vehicleType rn because idk what images were putting here  */}
+
+  const RouteCard = ({ vehicleType, company, cost, layovers, showRoutes }) => {
+  const [expanded, setExpanded] = useState(false);
+  const Chevron = expanded ? "▲" : "▼";
+
+  let IconComponent;
+  switch (vehicleType.toLowerCase()) {
+    case "plane": IconComponent = Plane; break;
+    case "train": IconComponent = TrainFront; break;
+    case "bus": IconComponent = BusFront; break;
+    default: IconComponent = Rat; break;
+  }
+
+  const classes = `route fade-in flex justify-center border border-gray-200 rounded-xl p-4 mb-3 bg-white shadow hover:shadow-md transition w-full max-w-3xl ${showRoutes ? "show" : ""}`;
+
+  return (
+    <div className={classes}>
+      {/* Top row */}
+      <div className="flex justify-between w-full items-center">
+        <div className="companyName font-semibold text-blue-700 flex gap-2 items-center">
+          <IconComponent className="w-5 h-5 text-gray-600" />
+          <p>{company}</p>
+        </div>
+        <button onClick={() => setExpanded(!expanded)} className="text-xl select-none">
+          {Chevron}
+        </button>
+      </div>
+
+      <p className="font-medium">Cost = ${cost}</p>
+      {layovers.length > 0 ? (
+        <p>Layovers: ({layovers.join(", ")})</p>
+      ) : (
+        <p>Direct</p>
+      )}
+
+      {/* Dropdown section */}
+      {expanded && (
+        <div className="mt-3 p-3 bg-gray-100 rounded-lg text-left w-full">
+          <p className="font-semibold mb-2">Trip Details:</p>
+          <ul className="list-disc ml-5">
+            <li>Segment 1: Depart → {layovers[0] || destination}</li>
+            <li>Layover time: 2h</li>
+            <li>Segment 2: {layovers[0] || origin} → Final Destination</li>
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+};
+
+  
 
 
 
@@ -198,7 +213,7 @@ const handleSubmit = async (e) => {
     return;
   }
 
-  // const proxy = 'https://api.allorigins.win/get'
+  const proxy = 'https://api.allorigins.win/get'
   const targetUrl = 'http://routefinder-api-env-prod.eba-egdm2f3j.us-east-1.elasticbeanstalk.com/flights/search/?' +
   new URLSearchParams({
     departure_id: "PEK",
@@ -223,6 +238,12 @@ const handleSubmit = async (e) => {
   .catch(err => {
     console.error('Request failed:', err.message);
   });
+  setLoading(true);
+  setTimeout(() => {
+    setRoutes(dummyRoutes);
+    setShowRoutes(true);
+    setLoading(false);
+  }, 500);
 };
 
 
