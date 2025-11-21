@@ -17,7 +17,7 @@ def get_test(endpoint):
         #"travel_class": 1,
         #"exclude_basic": False,
         "currency": "USD",
-        "type": 1 #one way flight
+        "type": 1
     })
     data = get_response.json()
     print(data)
