@@ -122,22 +122,37 @@ class FlightSearchView(APIView):
         params["api_key"] = api_key
         params["multi_city_json"] = "true"
 
-        outbound_flights_dict = search_for_flights(self, params, search_id)
+        outbound_params = params.copy()
+        #set to type 2 for outbound search
+        outbound_params["type"] = 2
+        del outbound_params["return_date"]
+
+        print(">>> searching outbound flights <<<")
+        outbound_flights_dict = search_for_flights(self, outbound_params, search_id)
         flights_dict = {}
         flights_dict["outbound_trips"] = outbound_flights_dict
+        print(">>> outbound flights searched <<<")
         if is_round_trip:
+            print(">>> searching return flights <<<")
             return_params = params.copy()
             # swap departure and arrival for return flight
             return_params["departure_id"] = params.get("arrival_id")
             return_params["arrival_id"] = params.get("departure_id")
             return_params["outbound_date"] = params.get("return_date")
+            return_params["type"] = 2
             # remove return date for return flight search
             del return_params["return_date"]
             return_flights_dict = search_for_flights(self, return_params, return_search_id)
             flights_dict["return_trips"] = return_flights_dict
 
         print(">>> returning response <<<")
+        if is_round_trip:
+            print(f"Return flights found: {len(flights_dict['return_trips'])}")
+        print(f"Outbound flights found: {len(flights_dict['outbound_trips'])}")
+        if not flights_dict:
+            return Response({"error": "No flights found."},
+                            status=status.HTTP_404_NOT_FOUND)
         #dump flights to json and return response
-        # flights = json.dumps(flights_dict, indent=4)
-        # print(flights)
-        return Response(flights_dict, status=status.HTTP_200_OK)
+        flights = json.dumps(flights_dict, indent=4)
+        print(flights)
+        return Response(flights, status=status.HTTP_200_OK)
