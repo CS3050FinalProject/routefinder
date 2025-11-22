@@ -8,10 +8,10 @@ def get_test(endpoint):
     print("*"*30)
     get_response = requests.get(endpoint, params={
         "departure_id": "ORD",
-        "arrival_id": "MIA",
+        "arrival_id": "EWR",
         #"gl": "us",
         "hl": "en",
-        "type": 1,
+        "type": 2,
         "outbound_date": "2025-12-10",
         "return_date": "2025-12-16",
         #"travel_class": 1,
@@ -23,8 +23,8 @@ def get_test(endpoint):
 
 
 if __name__ == "__main__":
-    #endpoint = "http://routefinder-api-env-prod.eba-egdm2f3j.us-east-1.elasticbeanstalk.com/flights/search/"
-    endpoint = 'http://127.0.0.1:8000/flights/search'
+    endpoint = "http://routefinder-api-env-prod.eba-egdm2f3j.us-east-1.elasticbeanstalk.com/flights/search/"
+    #endpoint = 'http://127.0.0.1:8000/flights/search'
     #post_test(endpoint)
     get_test(endpoint)
 
