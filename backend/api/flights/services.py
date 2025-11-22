@@ -1,12 +1,17 @@
 '''Flight services.
 '''
+from asyncio.log import logger
 import json
 import hashlib
-from datetime import timedelta
 from typing import Optional
 
 from django.utils import timezone
 from django.db import transaction
+import requests
+from rest_framework.response import Response
+from rest_framework import status
+
+from api.searches.serializers import SearchSerializer
 from .models import Flight
 from ..searches.models import Search
 from .serializers import FlightSerializer
@@ -32,10 +37,9 @@ def save_flights(data, batch_size: int=10) -> dict:
 def generate_unique_search_id(
         departure_id: str,
         arrival_id: str,
-        outbound_date: str,
-        return_date: str) -> str:
+        outbound_date: str) -> str:
     '''Generates a unique search ID based on flight search parameters.'''
-    unique_string = f"{departure_id}-{arrival_id}-{outbound_date}-{return_date}"
+    unique_string = f"{departure_id}-{arrival_id}-{outbound_date}"
     return hashlib.md5(unique_string.encode()).hexdigest()
 
 def generate_unique_trip_id(full_trip_str: str) -> str:
@@ -84,3 +88,101 @@ def parse_flights_json(flights_list: list, search_id: str) -> Optional[list]:
             flights_to_save.append(flight_dict)
 
     return None if not flights_to_save else flights_to_save
+
+def get_flights_from_serpapi(URL, params: dict, search_id: str):
+    try:
+        r = requests.get(URL, params=params, timeout=15)
+        r.raise_for_status()
+        print(">>> SerpAPI request successful")
+        # If not found, create a new Search entry
+        print(">>> Saving search")
+        SearchSerializer.save_search(
+            {"search_id": search_id, "search_datetime": timezone.now()}
+        )
+    except requests.RequestException as exc:
+        logger.exception("SerpAPI request failed")
+        return Response({"error": "SerpAPI request failed",
+                            "detail": str(exc)},
+                        status=status.HTTP_502_BAD_GATEWAY)
+
+    # forward status code and JSON (or text if non-JSON)
+    try:
+        data = r.json()
+
+        # Save serp response to file for debugging
+        #with open('serp_response.txt', 'w') as f:
+        #    f.write(json.dumps(data, indent=2))
+
+        # Extract list of itineraries (adjust key if SerpAPI response uses a different one)
+        best_flights = data.get("best_flights") or None
+        other_flights = data.get("other_flights") or None
+        #print(f">>> Flight data: \nbest_flights: {best_flights}\nother_flights: {other_flights}")
+        try:
+            if not best_flights and not other_flights:
+                raise ValueError
+        except ValueError:
+            return Response({"error": "SerpAPI returned non-parseable JSON",
+                            "text": r.text[:200]},
+                            status=status.HTTP_502_BAD_GATEWAY)
+
+        if best_flights:
+            flights_to_save = parse_flights_json(best_flights, search_id)
+            FlightSerializer.save_flights(data=flights_to_save)
+        if other_flights:
+            flights_to_save = parse_flights_json(other_flights, search_id)
+            FlightSerializer.save_flights(data=flights_to_save)
+
+    except ValueError:
+        return Response({"error": "SerpAPI returned non-JSON",
+                            "text": r.text[:200]},
+                            status=status.HTTP_502_BAD_GATEWAY)
+    
+def search_for_flights(self, params: dict, search_id: str):
+    # Search Database for existing searches
+    print(">>> Checking for previous matching searches <<<")
+    existing_search = Search.objects.filter(search_id=search_id).first()
+    if existing_search:
+        print(">>> Existing search found")
+    else:
+        print(">>> No existing search found")
+
+    # make request to SerpAPI if not existing search and save to database
+    if not existing_search:
+        get_flights_from_serpapi(self.SERPAPI_URL, params, search_id)
+    
+    # Retrieve saved flights from database
+    try:
+        get_flights_by_search_id = FlightSerializer.get_flights_by_search_id(search_id)
+    except Exception as e:
+        print(e)
+        return requests.Response({"error": "There are no saved flights for this search"},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # group flights by trip_id into trips, preserving insertion order
+    trips_map = {}
+    for f in get_flights_by_search_id:
+        tid = f.get("trip_id")
+        if tid not in trips_map:
+            trips_map[tid] = {
+                "price": f.get("price"),
+                "type": f.get("type"),
+                "travel_class": f.get("travel_class"),
+                "flights": [],
+            }
+        # append flight leg (keep the same field shape as stored)
+        trips_map[tid]["flights"].append({
+            "departure_id": f.get("departure_id"),
+            "departure_airport": f.get("departure_airport"),
+            "departure_time": f.get("departure_time"),
+            "outbound_date": f.get("outbound_date"),
+            "arrival_id": f.get("arrival_id"),
+            "arrival_airport": f.get("arrival_airport"),
+            "arrival_time": f.get("arrival_time"),
+            "arrival_date": f.get("arrival_date"),
+            "duration": f.get("duration"),
+            "airline_name": f.get("airline_name"),
+            "airline_logo": f.get("airline_logo")
+        })
+
+    trips = list(trips_map.values())
+    return trips
