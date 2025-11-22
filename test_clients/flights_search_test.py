@@ -7,8 +7,8 @@ def get_test(endpoint):
     print("FLIGHTS SEARCH GET TEST")
     print("*"*30)
     get_response = requests.get(endpoint, params={
-        "departure_id": "MIA",
-        "arrival_id": "JFK",
+        "departure_id": "ORD",
+        "arrival_id": "MIA",
         #"gl": "us",
         "hl": "en",
         "type": 1,
