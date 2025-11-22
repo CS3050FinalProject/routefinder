@@ -138,51 +138,51 @@ def get_flights_from_serpapi(URL, params: dict, search_id: str):
                             status=status.HTTP_502_BAD_GATEWAY)
     
 def search_for_flights(self, params: dict, search_id: str):
-      # Search Database for existing searches
-        print(">>> Checking for previous matching searches <<<")
-        existing_search = Search.objects.filter(search_id=search_id).first()
-        if existing_search:
-            print(">>> Existing search found")
-        else:
-            print(">>> No existing search found")
+    # Search Database for existing searches
+    print(">>> Checking for previous matching searches <<<")
+    existing_search = Search.objects.filter(search_id=search_id).first()
+    if existing_search:
+        print(">>> Existing search found")
+    else:
+        print(">>> No existing search found")
 
-        # make request to SerpAPI if not existing search and save to database
-        if not existing_search:
-            get_flights_from_serpapi(self.SERPAPI_URL, params, search_id)
-        
-        # Retrieve saved flights from database
-        try:
-            get_flights_by_search_id = FlightSerializer.get_flights_by_search_id(search_id)
-        except Exception as e:
-            print(e)
-            return requests.Response({"error": "There are no saved flights for this search"},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    # make request to SerpAPI if not existing search and save to database
+    if not existing_search:
+        get_flights_from_serpapi(self.SERPAPI_URL, params, search_id)
+    
+    # Retrieve saved flights from database
+    try:
+        get_flights_by_search_id = FlightSerializer.get_flights_by_search_id(search_id)
+    except Exception as e:
+        print(e)
+        return requests.Response({"error": "There are no saved flights for this search"},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        # group flights by trip_id into trips, preserving insertion order
-        trips_map = {}
-        for f in get_flights_by_search_id:
-            tid = f.get("trip_id")
-            if tid not in trips_map:
-                trips_map[tid] = {
-                    "price": f.get("price"),
-                    "type": f.get("type"),
-                    "travel_class": f.get("travel_class"),
-                    "flights": [],
-                }
-            # append flight leg (keep the same field shape as stored)
-            trips_map[tid]["flights"].append({
-                "departure_id": f.get("departure_id"),
-                "departure_airport": f.get("departure_airport"),
-                "departure_time": f.get("departure_time"),
-                "outbound_date": f.get("outbound_date"),
-                "arrival_id": f.get("arrival_id"),
-                "arrival_airport": f.get("arrival_airport"),
-                "arrival_time": f.get("arrival_time"),
-                "arrival_date": f.get("arrival_date"),
-                "duration": f.get("duration"),
-                "airline_name": f.get("airline_name"),
-                "airline_logo": f.get("airline_logo")
-            })
+    # group flights by trip_id into trips, preserving insertion order
+    trips_map = {}
+    for f in get_flights_by_search_id:
+        tid = f.get("trip_id")
+        if tid not in trips_map:
+            trips_map[tid] = {
+                "price": f.get("price"),
+                "type": f.get("type"),
+                "travel_class": f.get("travel_class"),
+                "flights": [],
+            }
+        # append flight leg (keep the same field shape as stored)
+        trips_map[tid]["flights"].append({
+            "departure_id": f.get("departure_id"),
+            "departure_airport": f.get("departure_airport"),
+            "departure_time": f.get("departure_time"),
+            "outbound_date": f.get("outbound_date"),
+            "arrival_id": f.get("arrival_id"),
+            "arrival_airport": f.get("arrival_airport"),
+            "arrival_time": f.get("arrival_time"),
+            "arrival_date": f.get("arrival_date"),
+            "duration": f.get("duration"),
+            "airline_name": f.get("airline_name"),
+            "airline_logo": f.get("airline_logo")
+        })
 
-        trips = list(trips_map.values())
-        return trips
+    trips = list(trips_map.values())
+    return trips
