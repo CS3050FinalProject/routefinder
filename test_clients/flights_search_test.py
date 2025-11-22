@@ -12,8 +12,8 @@ def get_test(endpoint):
         #"gl": "us",
         "hl": "en",
         "type": 1,
-        "outbound_date": "2025-12-15",
-        "return_date": "2025-12-19",
+        "outbound_date": "2025-12-10",
+        "return_date": "2025-12-16",
         #"travel_class": 1,
         #"exclude_basic": False,
         "currency": "USD"
