@@ -7,11 +7,11 @@ def get_test(endpoint):
     print("FLIGHTS SEARCH GET TEST")
     print("*"*30)
     get_response = requests.get(endpoint, params={
-        "departure_id": "MIA",
+        "departure_id": "ORD",
         "arrival_id": "JFK",
         #"gl": "us",
         "hl": "en",
-        "type": 1,
+        "type": 2,
         "outbound_date": "2025-12-15",
         "return_date": "2025-12-19",
         #"travel_class": 1,

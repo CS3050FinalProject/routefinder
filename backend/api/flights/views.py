@@ -123,9 +123,6 @@ class FlightSearchView(APIView):
         params["multi_city_json"] = "true"
 
         outbound_params = params.copy()
-        #set to type 2 for outbound search
-        outbound_params["type"] = 2
-        del outbound_params["return_date"]
 
         print(">>> searching outbound flights <<<")
         outbound_flights_dict = search_for_flights(self, outbound_params, search_id)
