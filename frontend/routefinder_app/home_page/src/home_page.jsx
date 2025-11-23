@@ -23,24 +23,20 @@ const isValidateText = (value) => {
 
 
 
-  function DirectSwitch(roundTrip, setRoundTrip) {
-    const handleChange = (e) => {
-    if(e.target.checked){
-      setRoundTrip(1);
-    }
-    else{
-      setRoundTrip(2);
-    }
+  function DirectSwitch({ roundTrip, setRoundTrip }) {
+  const handleChange = (e) => {
+    setRoundTrip(e.target.checked ? 2 : 1);
   };
+
   return (
-      <Form.Check
-        type="switch"
-        name = "RoundTripSwitch"
-        id="RoundTripSwitch"
-        label="Round Trip?"
-        checked={roundTrip === 2}
-        onChange={handleChange}
-      />
+    <Form.Check
+      type="switch"
+      name="RoundTripSwitch"
+      id="RoundTripSwitch"
+      label="Round Trip?"
+      checked={roundTrip === 2}
+      onChange={handleChange}
+    />
   );
 }
 
@@ -146,7 +142,7 @@ const DateRangeWithPortal = ({ departureTime = new Date(), arrivalTime = new Dat
   // returns a card containing all that data formatted horizontally
   // I only return a a string of vehicleType rn because idk what images were putting here
 
-  const RouteCard = ({ vehicleType, company, cost, layovers, showRoutes }) => {
+  const RouteCard = ({ vehicleType, companyLogo, company, cost, time, layovers, showRoutes }) => {
   let IconComponent;
 
   // Pick which icon to use
@@ -168,21 +164,29 @@ const DateRangeWithPortal = ({ departureTime = new Date(), arrivalTime = new Dat
   const classes = `route fade-in flex justify-center border border-gray-200 rounded-xl p-4 mb-3 bg-white shadow hover:shadow-md transition w-full max-w-3xl ${showRoutes ? "show" : ""}`;
 
   return (
-    <div className={classes} >
-      <div className="companyName font-semibold text-blue-700">
-        <IconComponent className="w-5 h-5 text-gray-600" /><p>{company}</p>
+      <div className={classes}>
+        <div className="companyName font-semibold text-blue-700">
+          <IconComponent className="w-5 h-5 text-gray-600"/>
+
+          <img src={companyLogo}/>
+          <p>{company}</p>
         </div>
         <p className="font-medium">Cost = ${cost}</p>
+            { time % 60 !== 0 ? (
+        <p className="font-medium">{parseInt(time / 60)} hours and {time % 60} minutes</p>
+      ) : (
+        <p className="font-medium">{parseInt(time / 60)} hours</p>
+      )}
         {layovers.length > 0 ? (
-        <p>Layovers: ({layovers.join(", ")})</p>
+            <p>Layovers: ({layovers.join(", ")})</p>
         ) : (
-        <p>Direct</p>
+            <p>Direct</p>
         )}
-    </div>
+      </div>
   );
-};
+  };
 
-  export default function AirportRoutes() {
+export default function AirportRoutes() {
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
   const [routes, setRoutes] = useState([]);
@@ -195,18 +199,18 @@ const DateRangeWithPortal = ({ departureTime = new Date(), arrivalTime = new Dat
 
 
   // Dummy route data. just call the function with the data we get from the api
-  const dummyRoutes = [
-    {id: 1, vehicleType: "Plane", company: "Delta Airlines", cost: "350", layovers: ["ORD"]},
-    {id: 2, vehicleType: "Plane", company: "United Airlines", cost: "420", layovers: ["DFW", "DEN"]},
-    {id: 3, vehicleType: "Train", company: "Amtrak", cost: "6969696", layovers: []},
-    {id: 4, vehicleType: "Bus", company: "GreyHound", cost: "25", layovers: ["JFK"] },
-    { id: 5, vehicleType: "Plane", company: "Ryanair", cost: "50", layovers: ["DFW", "DEN", "KAS", 'JFK'] },
-    { id: 6, vehicleType: "Train", company: "BNSF Railway", cost: "3043", layovers: ["KAS", 'JFK'] },
-    { id: 7, vehicleType: "Train", company: "Union Pacific", cost: "291", layovers: ["KSF", 'PEO'] },
-    { id: 8, vehicleType: "Train", company: "Norfolk Southern", cost: "48", layovers: [] },
-    { id: 9, vehicleType: "Bus", company: "GMT", cost: "38", layovers: [] },
-    { id: 10, vehicleType: "buss", company: "fake company 1", cost: "23", layovers: ["helLA"] },
-    { id: 11, vehicleType: "ahbfa", company: "fake company 2", cost: "232", layovers: ["hell"] },
+  let Routes = [
+    {id: 1, vehicleType: "Plane", companyLogo: 'https://www.gstatic.com/flights/airline_logos/70px/F9.png/', company: "Delta Airlines", cost: "350", layovers: ["ORD"]},
+    {id: 2, vehicleType: "Plane", companyLogo: 'https://www.gstatic.com/flights/airline_logos/70px/F9.png/',company: "United Airlines", cost: "420", layovers: ["DFW", "DEN"]},
+    {id: 3, vehicleType: "Train", companyLogo: 'https://www.gstatic.com/flights/airline_logos/70px/F9.png/',company: "Amtrak", cost: "6969696", layovers: []},
+    {id: 4, vehicleType: "Bus", companyLogo: 'https://www.gstatic.com/flights/airline_logos/70px/F9.png/',company: "GreyHound", cost: "25", layovers: ["JFK"] },
+    { id: 5, vehicleType: "Plane", companyLogo: 'https://www.gstatic.com/flights/airline_logos/70px/F9.png/',company: "Ryanair", cost: "50", layovers: ["DFW", "DEN", "KAS", 'JFK'] },
+    { id: 6, vehicleType: "Train",companyLogo: 'https://www.gstatic.com/flights/airline_logos/70px/F9.png/', company: "BNSF Railway", cost: "3043", layovers: ["KAS", 'JFK'] },
+    { id: 7, vehicleType: "Train",companyLogo: 'https://www.gstatic.com/flights/airline_logos/70px/F9.png/', company: "Union Pacific", cost: "291", layovers: ["KSF", 'PEO'] },
+    { id: 8, vehicleType: "Train", companyLogo: 'https://www.gstatic.com/flights/airline_logos/70px/F9.png/',company: "Norfolk Southern", cost: "48", layovers: [] },
+    { id: 9, vehicleType: "Bus", companyLogo: 'https://www.gstatic.com/flights/airline_logos/70px/F9.png/',company: "GMT", cost: "38", layovers: [] },
+    { id: 10, vehicleType: "buss", companyLogo: 'https://www.gstatic.com/flights/airline_logos/70px/F9.png/',company: "fake company 1", cost: "23", layovers: ["helLA"] },
+    { id: 11, vehicleType: "ahbfa", companyLogo: 'https://www.gstatic.com/flights/airline_logos/70px/F9.png/',company: "fake company 2", cost: "232", layovers: ["hell"] },
   ];
 
 
@@ -255,9 +259,41 @@ const handleSubmit = async (e) => {
     try {
       const json_response = JSON.parse(all_response);
       const responses = JSON.parse(json_response);
+      let total_time = 0;
+      let layovers = [];
       console.log('Parsed proxied JSON:', json_response);
-      console.log(responses.Trips.length);
-      setRoutes(dummyRoutes);
+      console.log('length:',responses.outbound_trips.length)
+      console.log('price:',responses.outbound_trips[0].price)
+      console.log('roundtrip var :',roundTrip)
+      Routes= []
+      for(const trip_indx in responses.outbound_trips){
+        total_time = 0;
+        layovers = [];
+
+        if (responses.outbound_trips[trip_indx].flights.length > 1) {
+            for(const flight_indx in responses.outbound_trips[trip_indx].flights){
+              total_time = total_time + responses.outbound_trips[trip_indx].flights[flight_indx].duration;
+              if (flight_indx !== responses.outbound_trips[trip_indx].flights.length){
+                layovers.push(responses.outbound_trips[trip_indx].flights[flight_indx].arrival_id)
+              }
+            }
+          }
+          else{
+            total_time = responses.outbound_trips[trip_indx].flights[0].duration;
+          }
+        Routes.push({
+          id: trip_indx,
+          companyLogo: responses.outbound_trips[trip_indx].flights[0].airline_logo,
+          vehicleType: "Plane",
+          time: total_time,
+          company: responses.outbound_trips[trip_indx].flights[0].airline_name,
+          cost: `${responses.outbound_trips[trip_indx].price}`,
+          layovers: layovers
+        });
+      }
+      setRoutes(Routes)
+
+      setRoutes(Routes);
       setTimeout(() => setShowRoutes(true), 1000);
     } catch (e) {
       console.log('Proxied text (not JSON):', all_response);
@@ -278,21 +314,20 @@ const handleSubmit = async (e) => {
           <a href={'https://main.d3oqjx740ps4dp.amplifyapp.com'}>
             <RoutefinderLogo width={200} height={200} className="mt-4"/>
           </a>
-           <Form_Grid
-            origin={origin}
-            setOrigin={setOrigin}
-            destination={destination}
-            setDestination={setDestination}
-            departureTime={departureTime}
-            arrivalTime={arrivalTime}
-            roundTrip={roundTrip}
-            setRoundTrip = {setRoundTrip}
-            handleSubmit={handleSubmit}
+          <Form_Grid
+              origin={origin}
+              setOrigin={setOrigin}
+              destination={destination}
+              setDestination={setDestination}
+              departureTime={departureTime}
+              arrivalTime={arrivalTime}
+              roundTrip={roundTrip}
+              setRoundTrip={setRoundTrip}
+              handleSubmit={handleSubmit}
           />
 
 
         </header>
-
 
         {routes.length > 0 && (
             <div className="flex flex-col items-center mt-8 w-full">
@@ -307,7 +342,7 @@ const handleSubmit = async (e) => {
       </div>
     </div>
   );
-}
+  }
 
 
 
