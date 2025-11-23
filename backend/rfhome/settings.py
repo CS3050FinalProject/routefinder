@@ -140,5 +140,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "https://routefinder.lukeholmes.dev",  # add your production frontend domain
+    "https://routefinder.lukeholmes.dev"
 ]
