@@ -143,3 +143,5 @@ CORS_ALLOWED_ORIGINS = [
     "https://*.amplifyapp.com",
     "https://routefinder.lukeholmes.dev"
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
