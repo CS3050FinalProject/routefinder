@@ -267,57 +267,58 @@ const handleSubmit = async (e) => {
     format:       "json",
     type: roundTrip //one way flight
   }
-})
-  // axios.get('https://api.allorigins.win/get', { params: { url: targetUrl } })
-  //   .then(response => {
-  //   const all_response = response.data.contents;
-  //   try {
-  //     const json_response = JSON.parse(all_response);
-  //     const responses = JSON.parse(json_response);
-  //     let total_time = 0;
-  //     let layovers = [];
-  //     console.log('Parsed proxied JSON:', json_response);
-  //     console.log('length:',responses.outbound_trips.length)
-  //     console.log('price:',responses.outbound_trips[0].price)
-  //     console.log('roundtrip var :',roundTrip)
-  //     Routes= []
-  //     for(const trip_indx in responses.outbound_trips){
-  //       total_time = 0;
-  //       layovers = [];
+  }).then(response => {
+    console.log('Raw response:', response.data);
+    console.log('Response type:', typeof response.data);
+    
+    // Parse the JSON string once
+    const responses = response.data;
+    
+    console.log('Parsed response:', responses);
+    console.log('Number of trips:', responses.outbound_trips.length);
+    
+    Routes = [];
+    
+    for(const trip_indx in responses.outbound_trips){
+      let total_time = 0;
+      let layovers = [];
+      const trip = responses.outbound_trips[trip_indx];
 
-  //       if (responses.outbound_trips[trip_indx].flights.length > 1) {
-  //           for(const flight_indx in responses.outbound_trips[trip_indx].flights){
-  //             total_time = total_time + responses.outbound_trips[trip_indx].flights[flight_indx].duration;
-  //             if (flight_indx !== responses.outbound_trips[trip_indx].flights.length){
-  //               layovers.push(responses.outbound_trips[trip_indx].flights[flight_indx].arrival_id)
-  //             }
-  //           }
-  //         }
-  //         else{
-  //           total_time = responses.outbound_trips[trip_indx].flights[0].duration;
-  //         }
-  //       Routes.push({
-  //         id: trip_indx,
-  //         companyLogo: responses.outbound_trips[trip_indx].flights[0].airline_logo,
-  //         vehicleType: "Plane",
-  //         time: total_time,
-  //         company: responses.outbound_trips[trip_indx].flights[0].airline_name,
-  //         cost: `${responses.outbound_trips[trip_indx].price}`,
-  //         layovers: layovers
-  //       });
-  //     }
-  //     setRoutes(Routes)
+      // Skip trips with null prices
+      if (trip.price === null) continue;
 
-  //     setRoutes(Routes);
-  //     setTimeout(() => setShowRoutes(true), 1000);
-  //   } catch (e) {
-  //     console.log('Proxied text (not JSON):', all_response);
-  //   }
-  // })
-  // .catch(err => {
-  //   console.error('Request failed:', err.message);
-  // });
+      if (trip.flights.length > 1) {
+        for(let i = 0; i < trip.flights.length; i++){
+          total_time += trip.flights[i].duration;
+          // Add layover for all flights except the last one
+          if (i < trip.flights.length - 1) {
+            layovers.push(trip.flights[i].arrival_id);
+          }
+        }
+      } else {
+        total_time = trip.flights[0].duration;
+      }
+
+      Routes.push({
+        id: trip_indx,
+        companyLogo: trip.flights[0].airline_logo,
+        vehicleType: "Plane",
+        time: total_time,
+        company: trip.flights[0].airline_name,
+        cost: trip.price,
+        layovers: layovers
+      });
+    }
+    
+    setRoutes(Routes);
+    setTimeout(() => setShowRoutes(true), 100);
+  })
+  .catch(err => {
+    console.error('Request failed:', err);
+    alert('Failed to fetch flight data. Please try again.');
+  });
 };
+  // axios.get('https://api.allorigins.win/get', { params: { url: targetUrl } })
 
 
 
