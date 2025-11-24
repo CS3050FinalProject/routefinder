@@ -254,7 +254,7 @@ const handleSubmit = async (e) => {
   // }).toString();
 
 
-  axios.get('https://routefinder.api.lukeholmes.dev', {
+  axios.get('https://routefinder.api.lukeholmes.dev/flights/search/', {
   params: {
     departure_id: origin,
     arrival_id:   destination,
