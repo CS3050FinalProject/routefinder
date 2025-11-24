@@ -152,4 +152,4 @@ class FlightSearchView(APIView):
         #dump flights to json and return response
         flights = json.dumps(flights_dict, indent=4)
         print(flights)
-        return Response(flights, status=status.HTTP_200_OK)
+        return Response(flights_dict, status=status.HTTP_200_OK)
