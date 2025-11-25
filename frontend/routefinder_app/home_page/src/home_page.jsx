@@ -25,7 +25,7 @@ const isValidateText = (value) => {
 
   function DirectSwitch({ roundTrip, setRoundTrip }) {
   const handleChange = (e) => {
-    setRoundTrip(e.target.checked ? 2 : 1);
+    setRoundTrip(e.target.checked ? 1 : 2);
   };
 
   return (
@@ -34,7 +34,7 @@ const isValidateText = (value) => {
       name="RoundTripSwitch"
       id="RoundTripSwitch"
       label="Round Trip?"
-      checked={roundTrip === 2}
+      checked={roundTrip === 1}
       onChange={handleChange}
     />
   );
@@ -61,38 +61,42 @@ const DateRangeWithPortal = ({ departureTime = new Date(), arrivalTime = new Dat
     // const current = new Date();
     // const date = `${current.getMonth()+1}/${current.getDate()}/${current.getFullYear()}`;
     // // const next_date = `${current.getMonth()+1}/${current.getDate()+1}/${current.getFullYear()}`;
-    // // const [dateRange, setDateRange] = useState([
-    // //   null,
-    // //   null
-    // // ]);
-    // const [startDate, endDate] = dateRange;
+    const [dateRange, setDateRange] = useState([
+      null,
+      null
+    ]);
+    const [startDate, endDate] = dateRange;
 
     const [selectedDate, setSelectedDate] = useState(new Date());
     const handleChange = (date) => {
+    if (roundTrip == 1) {
+      setDateRange(date);
+
+      // setDateRange now already works
+
+      if (date[1]) {
+        arrivalTime = `${date[1].getFullYear()}-${date[1].getMonth() + 1}-${date[1].getDate()}`;
+      }
+        departureTime = `${date[0].getFullYear()}-${date[0].getMonth() + 1}-${date[0].getDate()}`;
+
+    } else {
       setSelectedDate(date);
-      departureTime = `${selectedDate.getFullYear()}/${selectedDate.getMonth()+1}/${selectedDate.getDate()}`
-      console.log('departureTime:',departureTime)
-    };
-    return (
-      //       <DatePicker
-      //     startDate={startDate}
-      //     endDate={endDate}
-      //     onChange={setDateRange}
-      //       //   outbound_date:"2025-12-14",
-      //       //   return_date:  "2025-12-16",
-      //     // onChange={departureTime = `${startDate.getFullYear()}/${startDate.getMonth()+1}/${startDate.getDate()}`}
-      //     // onChange={arrivalTime =  `${endDate.getFullYear()}/${endDate.getMonth()+1}/${endDate.getDate()}`}
-      //
-      //     selectsRange
-      //     withPortal
-      //   // onChange={(update) => {
-      //   //   setDateRange(update);
-      //   //   /// need to make this work
-      //   //   departureTime = `${startDate.getFullYear()}/${startDate.getMonth()+1}/${startDate.getDate()}`;
-      //   //   arrivalTime =  `${endDate.getFullYear()}/${endDate.getMonth()+1}/${endDate.getDate()}`;
-      //   // }}
-      // />
-            <DatePicker selected={selectedDate} onChange={handleChange} withPortal/>
+      // one-way
+      departureTime = `${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`;
+    }
+  };
+
+      return (
+    <DatePicker 
+      startDate={startDate}
+      endDate={endDate}
+
+      onChange={handleChange}
+
+      selectsRange
+      withPortal
+    />
+  // <DatePicker selected={selectedDate} onChange={handleChange} withPortal/>
 
     );
   };
@@ -268,12 +272,13 @@ const DateRangeWithPortal = ({ departureTime = new Date(), arrivalTime = new Dat
   };
 
 export default function AirportRoutes() {
+  const current = new Date();
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
   const [routes, setRoutes] = useState([]);
-  const [roundTrip, setRoundTrip] = useState(1); // one way on start
-  const [departureTime] = useState([]);
-  const [arrivalTime] = useState([]);
+  const [roundTrip, setRoundTrip] = useState(2); // one way on start
+  const [departureTime] = useState(`${current.getFullYear()}-${current.getMonth()+1}-${current.getDate()}`);
+  const [arrivalTime] = useState(`${current.getFullYear()}-${current.getMonth()+1}-${current.getDate()+3}`);
   const [showRoutes, setShowRoutes] = useState(false);
 
 
@@ -320,6 +325,7 @@ const handleSubmit = async (e) => {
   // const proxy = 'https://api.allorigins.win/get'
   const formData = new FormData(e.target)
   const formDataObj = Object.fromEntries(formData.entries())
+  console.log(formDataObj)
   // const targetUrl = 'http://routefinder-api-env-prod.eba-egdm2f3j.us-east-1.elasticbeanstalk.com/flights/search/?' +
   // new URLSearchParams({
   //   departure_id: origin,
@@ -334,17 +340,17 @@ const handleSubmit = async (e) => {
   //   type: roundTrip //one way flight
   // }).toString();
 
-
   axios.get('https://routefinder.api.lukeholmes.dev/flights/search/', {
   params: {
     departure_id: origin,
     arrival_id:   destination,
     hl:           "en",
-    outbound_date:"2025-12-14",
-    return_date:  "2025-12-16",
-    // outbound_date: departureTime,
-    // return_date:  arrivalTime,
+    // outbound_date:"2025-12-14",
+    // return_date:  "2025-12-16",
+    outbound_date: departureTime,
+    return_date:  arrivalTime,
     currency:     "USD",
+    // travel_class: ,
     format:       "json",
     type: roundTrip //one way flight
   }
