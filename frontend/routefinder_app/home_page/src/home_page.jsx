@@ -56,30 +56,44 @@ function TravelClassSelect() {
 
 
 
-const DateRangeWithPortal = ({ departureTime = new Date(), arrivalTime = new Date()}) => {
+const DateRangeWithPortal = ({ departureTime = new Date(), arrivalTime = new Date(), roundTrip}) => {
     // keep dateRange as a stateful array [startDate, endDate]
-    const current = new Date();
-    const date = `${current.getMonth()+1}/${current.getDate()}/${current.getFullYear()}`;
-    const next_date = `${current.getMonth()+1}/${current.getDate()+1}/${current.getFullYear()}`;
-    const [dateRange, setDateRange] = useState([date, next_date]);
-    const [startDate, endDate] = dateRange;
+    // const current = new Date();
+    // const date = `${current.getMonth()+1}/${current.getDate()}/${current.getFullYear()}`;
+    // // const next_date = `${current.getMonth()+1}/${current.getDate()+1}/${current.getFullYear()}`;
+    // // const [dateRange, setDateRange] = useState([
+    // //   null,
+    // //   null
+    // // ]);
+    // const [startDate, endDate] = dateRange;
 
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const handleChange = (date) => {
+      setSelectedDate(date);
+      departureTime = `${selectedDate.getFullYear()}/${selectedDate.getMonth()+1}/${selectedDate.getDate()}`
+      console.log('departureTime:',departureTime)
+    };
     return (
-      <DatePicker
-        selected={startDate}
-        required={true}
-        startDate={startDate}
-        endDate={endDate}
-        onChange={(update) => {
-          setDateRange(update);
-          /// need to make this work
-          departureTime = `${startDate.getFullYear()}/${startDate.getMonth()+1}/${startDate.getDate()}`;
-          arrivalTime =  `${endDate.getFullYear()}/${endDate.getMonth()+1}/${endDate.getDate()}`;
-        }}
-        selectsRange
-        withPortal
-        placeholderText="Select date range"
-      />
+      //       <DatePicker
+      //     startDate={startDate}
+      //     endDate={endDate}
+      //     onChange={setDateRange}
+      //       //   outbound_date:"2025-12-14",
+      //       //   return_date:  "2025-12-16",
+      //     // onChange={departureTime = `${startDate.getFullYear()}/${startDate.getMonth()+1}/${startDate.getDate()}`}
+      //     // onChange={arrivalTime =  `${endDate.getFullYear()}/${endDate.getMonth()+1}/${endDate.getDate()}`}
+      //
+      //     selectsRange
+      //     withPortal
+      //   // onChange={(update) => {
+      //   //   setDateRange(update);
+      //   //   /// need to make this work
+      //   //   departureTime = `${startDate.getFullYear()}/${startDate.getMonth()+1}/${startDate.getDate()}`;
+      //   //   arrivalTime =  `${endDate.getFullYear()}/${endDate.getMonth()+1}/${endDate.getDate()}`;
+      //   // }}
+      // />
+            <DatePicker selected={selectedDate} onChange={handleChange} withPortal/>
+
     );
   };
 
@@ -121,7 +135,8 @@ const DateRangeWithPortal = ({ departureTime = new Date(), arrivalTime = new Dat
         <Col>
           <DateRangeWithPortal
           departureTime={departureTime}
-          arrivalTime={arrivalTime}/>
+          arrivalTime={arrivalTime}
+          roundTrip={roundTrip}/>
         </Col>
         <Col>
           <TravelClassSelect />
@@ -143,7 +158,9 @@ const DateRangeWithPortal = ({ departureTime = new Date(), arrivalTime = new Dat
   // I only return a a string of vehicleType rn because idk what images were putting here
 
   const RouteCard = ({ vehicleType, companyLogo, company, cost, time, layovers, showRoutes }) => {
-  let IconComponent;
+    const [expanded, setExpanded] = useState(false);
+    const Chevron = expanded ? "▲" : "▼";
+    let IconComponent;
 
   // Pick which icon to use
   switch (vehicleType.toLowerCase()) {
@@ -165,6 +182,7 @@ const DateRangeWithPortal = ({ departureTime = new Date(), arrivalTime = new Dat
 
   return (
       <div className={classes}>
+        {/* Top row */}
         <div className="companyName font-semibold text-blue-700">
           <IconComponent className="w-5 h-5 text-gray-600"/>
 
@@ -172,16 +190,79 @@ const DateRangeWithPortal = ({ departureTime = new Date(), arrivalTime = new Dat
           <p>{company}</p>
         </div>
         <p className="font-medium">Cost = ${cost}</p>
-            { time % 60 !== 0 ? (
-        <p className="font-medium">{parseInt(time / 60)} hours and {time % 60} minutes</p>
-      ) : (
-        <p className="font-medium">{parseInt(time / 60)} hours</p>
-      )}
+        {time % 60 !== 0 ? (
+            <p className="font-medium">{parseInt(time / 60)} hours and {time % 60} minutes</p>
+        ) : (
+            <p className="font-medium">{parseInt(time / 60)} hours</p>
+        )}
         {layovers.length > 0 ? (
-            <p>Layovers: ({layovers.join(", ")})</p>
+            <>
+              {(() => {
+                const layover_ids = layovers.slice(0, -1).map(l => l.arrival_id);
+                return (
+                  <>
+                    <p>Layovers: ({layover_ids.join(", ")})</p>
+                    <button onClick={() => setExpanded(!expanded)} className="text-xl select-none">
+                      {Chevron}
+                    </button>
+                  </>
+                );
+              })()}
+            </>
         ) : (
             <p>Direct</p>
         )}
+
+
+        {/*/!* Dropdown section *!/*/}
+          {expanded && (
+            <div className="mt-3 p-3 bg-gray-100 rounded-lg text-left w-full">
+              <p className="font-semibold mb-2">Trip Details:</p>
+              <ul className="list-disc ml-5">
+                <li>Segment 1: Departure from {layovers[0].departure_id} → {layovers[0].arrival_id}</li>
+                      {(() => {
+                        const layover_segments = [];
+                        //Layover time segment
+                        for (let i = 1; i < layovers.length; i++) {
+                          if (i !== layovers.length) {
+                            const arrival_time = layovers[i-1].arrival_time;
+                            const departure_time = layovers[i ].departure_time;
+                            const [arrival_hours, arrival_minutes] = arrival_time.split(':').map(Number);
+                            console.log(arrival_hours, arrival_minutes)
+                            const [departure_hours, departure_minutes] = departure_time.split(':').map(Number);
+                            console.log(departure_hours, departure_minutes)
+                            const total_time = Math.abs((arrival_hours * 60 + arrival_minutes) -(departure_hours * 60 + departure_minutes));
+                            console.log('totaltime;',total_time)
+                            if (total_time % 60 !== 0) {
+                              layover_segments.push(
+                                <li key={`time-${i}`}>
+                                  Layover time: {parseInt(total_time / 60)} hours and {total_time % 60} minutes
+                                </li>
+                              );
+                            } else {
+                              layover_segments.push(
+                                <li key={`time-${i}`}>
+                                  Layover time: {parseInt(total_time / 60)} hours
+                                </li>
+                              );
+                            }
+                          }
+                          //Flight Segment
+                          layover_segments.push(
+                            <li key={`seg-${i}`}>
+                              Segment {i+1}: {layovers[i - 1].arrival_id} → {layovers[i].arrival_id}
+                            </li>
+                          );
+
+
+                        }
+                        return layover_segments;
+                      })()}
+
+              </ul>
+            </div>
+          )}
+
       </div>
   );
   };
@@ -290,14 +371,13 @@ const handleSubmit = async (e) => {
       if (trip.flights.length > 1) {
         for(let i = 0; i < trip.flights.length; i++){
           total_time += trip.flights[i].duration;
-          // Add layover for all flights except the last one
-          if (i < trip.flights.length - 1) {
-            layovers.push(trip.flights[i].arrival_id);
-          }
+          // Add layover for all flights including last one
+          layovers.push(trip.flights[i])
         }
       } else {
         total_time = trip.flights[0].duration;
       }
+      console.log('Response type:', layovers);
 
       Routes.push({
         id: trip_indx,
