@@ -78,6 +78,22 @@ header{
   transform: translateY(0);
 }
 
+.slide_out_to_left {
+  opacity: 0;
+  transform: translateY(-50%) translateX(-50px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.slide_in {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.slide_out_to_right {
+  opacity: 0;
+  transform: translateY(-50%) translateX(50px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
 .companyName{
   display: flex;
   align-items: center;
