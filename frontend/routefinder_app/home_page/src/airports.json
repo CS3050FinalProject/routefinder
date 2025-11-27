@@ -11,7 +11,7 @@
  },
  {
    "IATA": "ATL",
-   "AIRPORT": "William B Hartsfield-Atlanta Intl",
+   "AIRPORT": "William B Hartsfield-Atlanta International",
    "CITY": "Atlanta"
  },
  {
@@ -36,12 +36,12 @@
  },
  {
    "IATA": "BOS",
-   "AIRPORT": "Gen Edw L Logan Intl",
+   "AIRPORT": "Gen Edw L Logan International",
    "CITY": "Boston"
  },
  {
    "IATA": "BUF",
-   "AIRPORT": "Buffalo Niagara Intl",
+   "AIRPORT": "Buffalo Niagara International",
    "CITY": "Buffalo"
  },
  {
@@ -61,7 +61,7 @@
  },
  {
    "IATA": "CLE",
-   "AIRPORT": "Cleveland-Hopkins Intl",
+   "AIRPORT": "Cleveland-Hopkins International",
    "CITY": "Cleveland"
  },
  {
@@ -71,12 +71,12 @@
  },
  {
    "IATA": "CMH",
-   "AIRPORT": "Port Columbus Intl",
+   "AIRPORT": "Port Columbus International",
    "CITY": "Columbus"
  },
  {
    "IATA": "CVG",
-   "AIRPORT": "Cincinnati Northern Kentucky Intl",
+   "AIRPORT": "Cincinnati Northern Kentucky International",
    "CITY": "Covington"
  },
  {
@@ -91,7 +91,7 @@
  },
  {
    "IATA": "DEN",
-   "AIRPORT": "Denver Intl",
+   "AIRPORT": "Denver International",
    "CITY": "Denver"
  },
  {
@@ -111,7 +111,7 @@
  },
  {
    "IATA": "EWR",
-   "AIRPORT": "Newark Intl",
+   "AIRPORT": "Newark International",
    "CITY": "Newark"
  },
  {
@@ -151,7 +151,7 @@
  },
  {
    "IATA": "JFK",
-   "AIRPORT": "John F Kennedy Intl",
+   "AIRPORT": "John F Kennedy International",
    "CITY": "New York"
  },
  {
@@ -206,7 +206,7 @@
  },
  {
    "IATA": "MSP",
-   "AIRPORT": "Minneapolis-St Paul Intl",
+   "AIRPORT": "Minneapolis-St Paul International",
    "CITY": "Minneapolis"
  },
  {
@@ -256,12 +256,12 @@
  },
  {
    "IATA": "PDX",
-   "AIRPORT": "Portland Intl",
+   "AIRPORT": "Portland International",
    "CITY": "Portland"
  },
  {
    "IATA": "PHL",
-   "AIRPORT": "Philadelphia Intl",
+   "AIRPORT": "Philadelphia International",
    "CITY": "Philadelphia"
  },
  {
@@ -316,7 +316,7 @@
  },
  {
    "IATA": "SEA",
-   "AIRPORT": "Seattle-Tacoma Intl",
+   "AIRPORT": "Seattle-Tacoma International",
    "CITY": "Seattle"
  },
  {
@@ -336,7 +336,7 @@
  },
  {
    "IATA": "SLC",
-   "AIRPORT": "Salt Lake City Intl",
+   "AIRPORT": "Salt Lake City International",
    "CITY": "Salt Lake City"
  },
  {
@@ -456,7 +456,7 @@
  },
  {
    "IATA": "ART",
-   "AIRPORT": "Watertown Intl",
+   "AIRPORT": "Watertown International",
    "CITY": "Watertown"
  },
  {
@@ -476,7 +476,7 @@
  },
  {
    "IATA": "AVP",
-   "AIRPORT": "Wilkes-Barre Scranton Intl",
+   "AIRPORT": "Wilkes-Barre Scranton International",
    "CITY": "Wilkes-Barre Scranton"
  },
  {
@@ -506,7 +506,7 @@
  },
  {
    "IATA": "BIL",
-   "AIRPORT": "Billings Logan Intl",
+   "AIRPORT": "Billings Logan International",
    "CITY": "Billings"
  },
  {
@@ -521,7 +521,7 @@
  },
  {
    "IATA": "BLI",
-   "AIRPORT": "Bellingham Intl",
+   "AIRPORT": "Bellingham International",
    "CITY": "Bellingham"
  },
  {
@@ -676,7 +676,7 @@
  },
  {
    "IATA": "CPR",
-   "AIRPORT": "Natrona County Intl",
+   "AIRPORT": "Natrona County International",
    "CITY": "Casper"
  },
  {
@@ -711,7 +711,7 @@
  },
  {
    "IATA": "DAY",
-   "AIRPORT": "James M Cox Dayton Intl",
+   "AIRPORT": "James M Cox Dayton International",
    "CITY": "Dayton"
  },
  {
@@ -781,7 +781,7 @@
  },
  {
    "IATA": "ERI",
-   "AIRPORT": "Erie Intl",
+   "AIRPORT": "Erie International",
    "CITY": "Erie"
  },
  {
@@ -831,7 +831,7 @@
  },
  {
    "IATA": "FCA",
-   "AIRPORT": "Glacier Park Intl",
+   "AIRPORT": "Glacier Park International",
    "CITY": "Kalispell"
  },
  {
@@ -881,7 +881,7 @@
  },
  {
    "IATA": "GEG",
-   "AIRPORT": "Spokane Intl",
+   "AIRPORT": "Spokane International",
    "CITY": "Spokane"
  },
  {
@@ -946,7 +946,7 @@
  },
  {
    "IATA": "GTF",
-   "AIRPORT": "Great Falls Intl",
+   "AIRPORT": "Great Falls International",
    "CITY": "Great Falls"
  },
  {
@@ -1206,7 +1206,7 @@
  },
  {
    "IATA": "MDT",
-   "AIRPORT": "Harrisburg Intl",
+   "AIRPORT": "Harrisburg International",
    "CITY": "Harrisburg"
  },
  {
@@ -1562,7 +1562,7 @@
  {
    "IATA": "SPN",
    "AIRPORT": "Tinian International Airport",
-   "CITY": "NA"
+   "CITY": "Tinian Island"
  },
  {
    "IATA": "SPS",
@@ -1606,7 +1606,7 @@
  },
  {
    "IATA": "SYR",
-   "AIRPORT": "Syracuse-Hancock Intl",
+   "AIRPORT": "Syracuse-Hancock International",
    "CITY": "Syracuse"
  },
  {
@@ -1703,5 +1703,530 @@
    "IATA": "YUM",
    "AIRPORT": "Yuma MCAS-Yuma International",
    "CITY": "Yuma"
- }
+ },
+  {
+  "IATA": "LHR",
+  "AIRPORT": "Heathrow Airport",
+  "CITY": "London"
+  },
+  {
+  "IATA": "LGW",
+  "AIRPORT": "Gatwick Airport",
+  "CITY": "London"
+  },
+  {
+  "IATA": "LCY",
+  "AIRPORT": "London City Airport",
+  "CITY": "London"
+  },
+  {
+  "IATA": "STN",
+  "AIRPORT": "Stansted Airport",
+  "CITY": "London"
+  },
+  {
+  "IATA": "MAN",
+  "AIRPORT": "Manchester Airport",
+  "CITY": "Manchester"
+  },
+  {
+  "IATA": "EDI",
+  "AIRPORT": "Edinburgh Airport",
+  "CITY": "Edinburgh"
+  },
+  {
+  "IATA": "DUB",
+  "AIRPORT": "Dublin Airport",
+  "CITY": "Dublin"
+  },
+  {
+  "IATA": "CDG",
+  "AIRPORT": "Charles de Gaulle",
+  "CITY": "Paris"
+  },
+  {
+  "IATA": "ORY",
+  "AIRPORT": "Orly Airport",
+  "CITY": "Paris"
+  },
+  {
+  "IATA": "NCE",
+  "AIRPORT": "Nice Côte d'Azur",
+  "CITY": "Nice"
+  },
+  {
+  "IATA": "AMS",
+  "AIRPORT": "Schiphol Airport",
+  "CITY": "Amsterdam"
+  },
+  {
+  "IATA": "BRU",
+  "AIRPORT": "Brussels Airport",
+  "CITY": "Brussels"
+  },
+  {
+  "IATA": "FRA",
+  "AIRPORT": "Frankfurt Airport",
+  "CITY": "Frankfurt"
+  },
+  {
+  "IATA": "MUC",
+  "AIRPORT": "Munich Airport",
+  "CITY": "Munich"
+  },
+  {
+  "IATA": "ZRH",
+  "AIRPORT": "Zurich Airport",
+  "CITY": "Zurich"
+  },
+  {
+  "IATA": "VIE",
+  "AIRPORT": "Vienna Airport",
+  "CITY": "Vienna"
+  },
+  {
+  "IATA": "BCN",
+  "AIRPORT": "Barcelona-El Prat",
+  "CITY": "Barcelona"
+  },
+  {
+  "IATA": "MAD",
+  "AIRPORT": "Adolfo Suárez Madrid–Barajas",
+  "CITY": "Madrid"
+  },
+  {
+  "IATA": "LIS",
+  "AIRPORT": "Humberto Delgado (Lisbon)",
+  "CITY": "Lisbon"
+  },
+  {
+  "IATA": "ATH",
+  "AIRPORT": "Eleftherios Venizelos",
+  "CITY": "Athens"
+  },
+  {
+  "IATA": "IST",
+  "AIRPORT": "Istanbul Airport",
+  "CITY": "Istanbul"
+  },
+  {
+  "IATA": "SAW",
+  "AIRPORT": "Sabiha Gökçen",
+  "CITY": "Istanbul"
+  },
+  {
+  "IATA": "SVO",
+  "AIRPORT": "Sheremetyevo",
+  "CITY": "Moscow"
+  },
+  {
+  "IATA": "DME",
+  "AIRPORT": "Domodedovo",
+  "CITY": "Moscow"
+  },
+  {
+  "IATA": "LED",
+  "AIRPORT": "Pulkovo",
+  "CITY": "St. Petersburg"
+  },
+  {
+  "IATA": "DXB",
+  "AIRPORT": "Dubai International",
+  "CITY": "Dubai"
+  },
+  {
+  "IATA": "AUH",
+  "AIRPORT": "Abu Dhabi International",
+  "CITY": "Abu Dhabi"
+  },
+  {
+  "IATA": "DOH",
+  "AIRPORT": "Hamad International",
+  "CITY": "Doha"
+  },
+  {
+  "IATA": "RUH",
+  "AIRPORT": "King Khalid International",
+  "CITY": "Riyadh"
+  },
+  {
+  "IATA": "JED",
+  "AIRPORT": "King Abdulaziz International",
+  "CITY": "Jeddah"
+  },
+  {
+  "IATA": "CAI",
+  "AIRPORT": "Cairo International",
+  "CITY": "Cairo"
+  },
+  {
+  "IATA": "CMN",
+  "AIRPORT": "Mohammed V",
+  "CITY": "Casablanca"
+  },
+  {
+  "IATA": "RAK",
+  "AIRPORT": "Marrakech Menara",
+  "CITY": "Marrakech"
+  },
+  {
+  "IATA": "JNB",
+  "AIRPORT": "O. R. Tambo International",
+  "CITY": "Johannesburg"
+  },
+  {
+  "IATA": "CPT",
+  "AIRPORT": "Cape Town International",
+  "CITY": "Cape Town"
+  },
+  {
+  "IATA": "DUR",
+  "AIRPORT": "King Shaka International",
+  "CITY": "Durban"
+  },
+  {
+  "IATA": "NBO",
+  "AIRPORT": "Jomo Kenyatta International",
+  "CITY": "Nairobi"
+  },
+  {
+  "IATA": "ADD",
+  "AIRPORT": "Bole (Addis Ababa)",
+  "CITY": "Addis Ababa"
+  },
+  {
+  "IATA": "ACC",
+  "AIRPORT": "Kotoka",
+  "CITY": "Accra"
+  },
+  {
+  "IATA": "LOS",
+  "AIRPORT": "Murtala Muhammed International",
+  "CITY": "Lagos"
+  },
+  {
+  "IATA": "ABV",
+  "AIRPORT": "Nnamdi Azikiwe International",
+  "CITY": "Abuja"
+  },
+  {
+  "IATA": "KRT",
+  "AIRPORT": "Khartoum International",
+  "CITY": "Khartoum"
+  },
+  {
+  "IATA": "DAR",
+  "AIRPORT": "Julius Nyerere International",
+  "CITY": "Dar es Salaam"
+  },
+  {
+  "IATA": "LUN",
+  "AIRPORT": "Kenneth Kaunda International",
+  "CITY": "Lusaka"
+  },
+  {
+  "IATA": "HRE",
+  "AIRPORT": "Harare International",
+  "CITY": "Harare"
+  },
+  {
+  "IATA": "MNL",
+  "AIRPORT": "Ninoy Aquino International",
+  "CITY": "Manila"
+  },
+  {
+  "IATA": "ICN",
+  "AIRPORT": "Incheon International",
+  "CITY": "Seoul"
+  },
+  {
+  "IATA": "GMP",
+  "AIRPORT": "Gimpo International",
+  "CITY": "Seoul"
+  },
+  {
+  "IATA": "NRT",
+  "AIRPORT": "Narita International",
+  "CITY": "Tokyo"
+  },
+  {
+  "IATA": "HND",
+  "AIRPORT": "Haneda",
+  "CITY": "Tokyo"
+  },
+  {
+  "IATA": "KIX",
+  "AIRPORT": "Kansai International",
+  "CITY": "Osaka"
+  },
+  {
+  "IATA": "NGO",
+  "AIRPORT": "Chubu Centrair",
+  "CITY": "Nagoya"
+  },
+  {
+  "IATA": "PEK",
+  "AIRPORT": "Beijing Capital International",
+  "CITY": "Beijing"
+  },
+  {
+  "IATA": "PKX",
+  "AIRPORT": "Beijing Daxing International",
+  "CITY": "Beijing"
+  },
+  {
+  "IATA": "PVG",
+  "AIRPORT": "Pudong International",
+  "CITY": "Shanghai"
+  },
+  {
+  "IATA": "SHA",
+  "AIRPORT": "Hongqiao",
+  "CITY": "Shanghai"
+  },
+  {
+  "IATA": "HKG",
+  "AIRPORT": "Hong Kong International",
+  "CITY": "Hong Kong"
+  },
+  {
+  "IATA": "SIN",
+  "AIRPORT": "Changi",
+  "CITY": "Singapore"
+  },
+  {
+  "IATA": "KUL",
+  "AIRPORT": "Kuala Lumpur International",
+  "CITY": "Kuala Lumpur"
+  },
+  {
+  "IATA": "BKK",
+  "AIRPORT": "Suvarnabhumi",
+  "CITY": "Bangkok"
+  },
+  {
+  "IATA": "DMK",
+  "AIRPORT": "Don Mueang International",
+  "CITY": "Bangkok"
+  },
+  {
+  "IATA": "DEL",
+  "AIRPORT": "Indira Gandhi International",
+  "CITY": "New Delhi"
+  },
+  {
+  "IATA": "BOM",
+  "AIRPORT": "Chhatrapati Shivaji International",
+  "CITY": "Mumbai"
+  },
+  {
+  "IATA": "BLR",
+  "AIRPORT": "Kempegowda International",
+  "CITY": "Bengaluru"
+  },
+  {
+  "IATA": "HYD",
+  "AIRPORT": "Rajiv Gandhi International",
+  "CITY": "Hyderabad"
+  },
+  {
+  "IATA": "MAA",
+  "AIRPORT": "Chennai International",
+  "CITY": "Chennai"
+  },
+  {
+  "IATA": "CMB",
+  "AIRPORT": "Bandaranaike International",
+  "CITY": "Colombo"
+  },
+  {
+  "IATA": "KWI",
+  "AIRPORT": "Kuwait International",
+  "CITY": "Kuwait City"
+  },
+  {
+  "IATA": "BAH",
+  "AIRPORT": "Bahrain International",
+  "CITY": "Muharraq"
+  },
+  {
+  "IATA": "ISB",
+  "AIRPORT": "Islamabad International",
+  "CITY": "Islamabad"
+  },
+  {
+  "IATA": "KHI",
+  "AIRPORT": "Jinnah International",
+  "CITY": "Karachi"
+  },
+  {
+  "IATA": "LHE",
+  "AIRPORT": "Allama Iqbal International",
+  "CITY": "Lahore"
+  },
+  {
+  "IATA": "MCT",
+  "AIRPORT": "Seeb (Muscat International)",
+  "CITY": "Muscat"
+  },
+  {
+  "IATA": "TLV",
+  "AIRPORT": "Ben Gurion",
+  "CITY": "Tel Aviv"
+  },
+  {
+  "IATA": "AMM",
+  "AIRPORT": "Queen Alia International",
+  "CITY": "Amman"
+  },
+  {
+  "IATA": "BEY",
+  "AIRPORT": "Rafic Hariri International",
+  "CITY": "Beirut"
+  },
+  {
+  "IATA": "SCL",
+  "AIRPORT": "Arturo Merino Benítez",
+  "CITY": "Santiago"
+  },
+  {
+  "IATA": "EZE",
+  "AIRPORT": "Ministro Pistarini (Ezeiza)",
+  "CITY": "Buenos Aires"
+  },
+  {
+  "IATA": "AEP",
+  "AIRPORT": "Aeroparque Jorge Newbery",
+  "CITY": "Buenos Aires"
+  },
+  {
+  "IATA": "BOG",
+  "AIRPORT": "El Dorado International",
+  "CITY": "Bogotá"
+  },
+  {
+  "IATA": "LIM",
+  "AIRPORT": "Jorge Chávez International",
+  "CITY": "Lima"
+  },
+  {
+  "IATA": "GIG",
+  "AIRPORT": "Galeão–Antonio Carlos Jobim",
+  "CITY": "Rio de Janeiro"
+  },
+  {
+  "IATA": "GRU",
+  "AIRPORT": "Guarulhos–Governador André Franco Montoro",
+  "CITY": "São Paulo"
+  },
+  {
+  "IATA": "SJO",
+  "AIRPORT": "Juan Santamaría International",
+  "CITY": "San José"
+  },
+  {
+  "IATA": "MEX",
+  "AIRPORT": "Benito Juárez International",
+  "CITY": "Mexico City"
+  },
+  {
+  "IATA": "GDL",
+  "AIRPORT": "Miguel Hidalgo y Costilla",
+  "CITY": "Guadalajara"
+  },
+  {
+  "IATA": "CUN",
+  "AIRPORT": "Cancún International",
+  "CITY": "Cancún"
+  },
+  {
+  "IATA": "SJD",
+  "AIRPORT": "Los Cabos International",
+  "CITY": "San José del Cabo/Los Cabos"
+  },
+  {
+  "IATA": "YYZ",
+  "AIRPORT": "Toronto Pearson International",
+  "CITY": "Toronto"
+  },
+  {
+  "IATA": "YVR",
+  "AIRPORT": "Vancouver International",
+  "CITY": "Vancouver"
+  },
+  {
+  "IATA": "YYC",
+  "AIRPORT": "Calgary International",
+  "CITY": "Calgary"
+  },
+  {
+  "IATA": "YUL",
+  "AIRPORT": "Montréal–Trudeau International",
+  "CITY": "Montreal"
+  },
+  {
+  "IATA": "YOW",
+  "AIRPORT": "Ottawa Macdonald-Cartier International",
+  "CITY": "Ottawa"
+  },
+  {
+  "IATA": "YHZ",
+  "AIRPORT": "Halifax Stanfield International",
+  "CITY": "Halifax"
+  },
+  {
+  "IATA": "SYD",
+  "AIRPORT": "Sydney Kingsford Smith",
+  "CITY": "Sydney"
+  },
+  {
+  "IATA": "MEL",
+  "AIRPORT": "Melbourne",
+  "CITY": "Melbourne"
+  },
+  {
+  "IATA": "BNE",
+  "AIRPORT": "Brisbane",
+  "CITY": "Brisbane"
+  },
+  {
+  "IATA": "PER",
+  "AIRPORT": "Perth",
+  "CITY": "Perth"
+  },
+  {
+  "IATA": "ADL",
+  "AIRPORT": "Adelaide",
+  "CITY": "Adelaide"
+  },
+  {
+  "IATA": "AKL",
+  "AIRPORT": "Auckland International",
+  "CITY": "Auckland"
+  },
+  {
+  "IATA": "WLG",
+  "AIRPORT": "Wellington International",
+  "CITY": "Wellington"
+  },
+  {
+  "IATA": "NAN",
+  "AIRPORT": "Nadi International",
+  "CITY": "Nadi"
+  },
+  {
+  "IATA": "RAR",
+  "AIRPORT": "Rarotonga International",
+  "CITY": "Avarua"
+  },
+  {
+  "IATA": "PPT",
+  "AIRPORT": "Faa'a International (Papeete)",
+  "CITY": "Papeete"
+  },
+  {
+  "IATA": "HBA",
+  "AIRPORT": "Hobart International",
+  "CITY": "Hobart"
+  }
 ]
