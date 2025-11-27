@@ -150,40 +150,79 @@ const RouteCard = ({ companyLogo, company, cost, time, layovers, departDate, dep
   };
 
 // Component to display results
-export function FlightResults({ routes, showRoutes, loading }) {
+export function FlightResults({ routes, showRoutes, loading, viewType, onViewChange }) {
   if (loading) {
-  return (
-    <div className="w-full max-w-4xl mx-auto mt-8 text-center">
-    <p className="text-xl text-gray-600">Searching for flights...</p>
-    </div>
-  );
+    return (
+      <div className="w-full max-w-4xl mx-auto mt-8 text-center">
+        <p className="text-xl text-gray-600">Searching for flights...</p>
+      </div>
+    );
   }
 
-  if (!routes || routes.length === 0) {
-  return null;
+  const currentRoutes = viewType === 'outbound' ? routes.outbound : routes.return;
+  const hasReturnTrips = routes.return && routes.return.length > 0;
+
+  if (!currentRoutes || currentRoutes.length === 0) {
+    return null;
   }
 
   return (
-  <div className="w-full max-w-4xl mx-auto mt-8">
-    <h2 className="text-2xl font-bold mb-6 text-gray-700 text-center">Available Routes</h2>
-    <div className="routes flex flex-col gap-3">
-    {routes.map((route, idx) => (
-      <RouteCard 
-        key={idx} 
-        companyLogo={route.companyLogo}
-        company={route.company}
-        cost={route.cost}
-        time={route.time}
-        layovers={route.layovers}
-        departDate={route.departDate}
-        departureTime={route.departureTime}
-        arrivalDate={route.arrivalDate}
-        arrivalTime={route.arrivalTime}
-        showRoutes={showRoutes} 
-      />
-    ))}
+    <div className="w-full max-w-4xl mx-auto mt-8 relative">
+      {/* Navigation Buttons */}
+      {hasReturnTrips && (
+        <>
+          {/* Left Button - Show Outbound */}
+          {viewType === 'return' && (
+            <button
+              onClick={() => onViewChange('outbound')}
+              className="fixed left-4 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all z-50"
+              aria-label="View Outbound Flights"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+          )}
+
+          {/* Right Button - Show Return */}
+          {viewType === 'outbound' && (
+            <button
+              onClick={() => onViewChange('return')}
+              className="fixed right-4 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all z-50"
+              aria-label="View Return Flights"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          )}
+        </>
+      )}
+
+      {/* Title */}
+      <h2 className="text-2xl font-bold mb-6 text-gray-700 text-center">
+        {viewType === 'outbound' ? 'Outbound Flights' : 'Return Flights'}
+      </h2>
+
+      {/* Routes List */}
+      <div className="routes flex flex-col gap-3">
+        {currentRoutes.map((route, idx) => (
+          <RouteCard 
+            key={idx} 
+            companyLogo={route.companyLogo}
+            company={route.company}
+            cost={route.cost}
+            time={route.time}
+            layovers={route.layovers}
+            departDate={route.departDate}
+            departureTime={route.departureTime}
+            arrivalDate={route.arrivalDate}
+            arrivalTime={route.arrivalTime}
+            showRoutes={showRoutes} 
+          />
+        ))}
+      </div>
     </div>
-  </div>
   );
 }
 
@@ -235,40 +274,55 @@ export async function FlightSearch({ from, to, tripType, departDate, returnDate,
   throw new Error("Invalid response from server");
   }
 
-  console.log('Number of trips:', responses.outbound_trips.length);
+  console.log('Number of outbound trips:', responses.outbound_trips.length);
 
-  const routes = [];
+  const processTrips = (trips) => {
+    const routes = [];
+    
+    for (let i = 0; i < trips.length; i++) {
+      const trip = trips[i];
 
-  for (let i = 0; i < responses.outbound_trips.length; i++) {
-  const trip = responses.outbound_trips[i];
+      if (trip.price === null) continue;
 
-  if (trip.price === null) continue;
+      let total_time = 0;
+      let layovers = [];
 
-  let total_time = 0;
-  let layovers = [];
+      if (trip.flights.length > 1) {
+        for (let j = 0; j < trip.flights.length; j++) {
+          total_time += trip.flights[j].duration;
+          layovers.push(trip.flights[j]);
+        }
+      } else {
+        total_time = trip.flights[0].duration;
+      }
 
-  if (trip.flights.length > 1) {
-    for (let j = 0; j < trip.flights.length; j++) {
-    total_time += trip.flights[j].duration;
-    layovers.push(trip.flights[j]);
+      routes.push({
+        id: i,
+        companyLogo: trip.flights[0].airline_logo,
+        time: total_time,
+        company: trip.flights[0].airline_name,
+        cost: trip.price,
+        departureTime: trip.flights[0].departure_time,
+        departDate: trip.flights[0].departure_date || trip.flights[0].outbound_date,
+        arrivalTime: trip.flights[trip.flights.length - 1].arrival_time,
+        arrivalDate: trip.flights[trip.flights.length - 1].arrival_date,
+        layovers: layovers
+      });
     }
-  } else {
-    total_time = trip.flights[0].duration;
+    
+    return routes;
+  };
+
+  const outboundRoutes = processTrips(responses.outbound_trips);
+  let returnRoutes = [];
+
+  if (roundTrip === 1 && responses.return_trips) {
+    console.log('Number of return trips:', responses.return_trips.length);
+    returnRoutes = processTrips(responses.return_trips);
   }
 
-  routes.push({
-    id: i,
-    companyLogo: trip.flights[0].airline_logo,
-    time: total_time,
-    company: trip.flights[0].airline_name,
-    cost: trip.price,
-    departureTime: trip.flights[0].departure_time,
-    departDate: trip.flights[0].outbound_date,
-    arrivalTime: trip.flights[trip.flights.length - 1].arrival_time,
-    arrivalDate: trip.flights[trip.flights.length - 1].arrival_date,
-    layovers: layovers
-  });
-  }
-
-  return routes;
+  return {
+    outbound: outboundRoutes,
+    return: returnRoutes
+  };
 }

@@ -24,9 +24,10 @@ export default function SearchBar() {
   const [showFromSuggestions, setShowFromSuggestions] = useState(false);
   const [showToSuggestions, setShowToSuggestions] = useState(false);
   
-  const [routes, setRoutes] = useState([]);
+  const [routes, setRoutes] = useState({ outbound: [], return: [] });
   const [showRoutes, setShowRoutes] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [viewType, setViewType] = useState('outbound'); // 'outbound' or 'return'
   
   const fromRef = useRef(null);
   const toRef = useRef(null);
@@ -90,6 +91,7 @@ export default function SearchBar() {
     // Implement search functionality here
     setLoading(true);
     setShowRoutes(false);
+    setViewType('outbound'); // Reset to outbound view
 
      try {
       const searchResults = await FlightSearch({
@@ -106,7 +108,7 @@ export default function SearchBar() {
     } catch (error) {
       console.error('Search failed:', error);
       alert(error.message || 'Failed to fetch flight data. Please try again.');
-      setRoutes([]);
+      setRoutes({ outbound: [], return: [] });
     } finally {
       setLoading(false);
     }
@@ -352,7 +354,13 @@ export default function SearchBar() {
         </div>
       </div>
       {/* Flight Results */}
-      <FlightResults routes={routes} showRoutes={showRoutes} /> 
+      <FlightResults 
+        routes={routes} 
+        showRoutes={showRoutes} 
+        loading={loading}
+        viewType={viewType}
+        onViewChange={setViewType}
+      /> 
       </div>
     </div>
   );
