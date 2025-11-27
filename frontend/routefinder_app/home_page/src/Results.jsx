@@ -20,9 +20,13 @@ const formatTime = (time24) => {
 // Format date to readable format
 const formatDate = (date) => {
   if (!date) return '';
-  const d = new Date(date);
+  const [year, month, day] = date.split('-').map(Number);
+  const d = new Date(year, month - 1, day); //makes it actually the local time of the flight not the users
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 };
+
+
+
   
   // RouteCard
   // A function that takes data about the trip (I forgot what data we were using but this is easily expanded)
@@ -60,22 +64,27 @@ const RouteCard = ({ companyLogo, company, cost, time, layovers, departDate, dep
 
       {/* Layovers */}
       <div className="flex flex-col items-center min-w-[140px]">
-        <div className="text-xs text-gray-500 mb-1">Stops</div>
-        <div className="font-medium text-gray-800"></div>
+
         {layovers.length > 0 ? (
         <>
         {(() => {
           const layover_ids = layovers.slice(0, -1).map(l => l.arrival_id);
           return (
-          <>
-            <p>Layovers: ({layover_ids.join(", ")})</p>
-          </>
+              <>
+                <div className="text-xs text-gray-500 mb-1">Stops</div>
+                <div className="font-medium text-gray-800"></div>
+                <p>{layover_ids.join(", ")}</p>
+              </>
           );
         })()}
         </>
-      ) : (
-        <p>Direct</p>
-      )}
+        ) : (
+            <>
+              <div className="text-xs text-gray-500 mb-1"> </div>
+              <div className="font-medium text-gray-800"></div>
+              <p>Direct</p>
+            </>
+        )}
 
       </div>
 
@@ -151,6 +160,8 @@ const RouteCard = ({ companyLogo, company, cost, time, layovers, departDate, dep
 
 // Component to display results
 export function FlightResults({ routes, showRoutes, loading, viewType, onViewChange }) {
+  const [slideOut, setSlideOut] = useState(false);
+  const [slideIn, setSlideIn] = useState(true);
   if (loading) {
     return (
       <div className="w-full max-w-4xl mx-auto mt-8 text-center">
@@ -166,34 +177,69 @@ export function FlightResults({ routes, showRoutes, loading, viewType, onViewCha
     return null;
   }
 
+
+
+  const handleOutboundClick = () => {
+// Slide button out
+    setSlideOut(true);
+    setSlideIn(false);
+    //change view after animation
+    setTimeout(() => {
+      onViewChange("outbound");
+      setSlideOut(false);
+      setSlideIn(true);}, 400);
+
+
+  };
+
+  const handleReturnClick = () => {
+// Slide button out
+    setSlideOut(true);
+    setSlideIn(false);
+    //change view after animation
+    setTimeout(() => {
+      onViewChange("return");
+      setSlideOut(false);
+      setSlideIn(true);}, 400);
+  };
+
   return (
     <div className="w-full max-w-4xl mx-auto mt-8 relative">
       {/* Navigation Buttons */}
       {hasReturnTrips && (
         <>
           {/* Left Button - Show Outbound */}
+          {}
           {viewType === 'return' && (
-            <button
-              onClick={() => onViewChange('outbound')}
-              className="fixed left-4 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all z-50"
-              aria-label="View Outbound Flights"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
+              <button
+
+
+                  onClick={handleOutboundClick}
+
+                  className={`${slideIn ? "slide_in" : ""} ${slideOut ? "slide_out_to_left" : ""} flex flex-col gap-2 items-center text-[.5em] font-bold fixed left-4 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all z-50`}
+
+                  aria-label="View Outbound Flights"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/>
+                </svg>
+                Outbound Flights
+
+              </button>
           )}
 
           {/* Right Button - Show Return */}
           {viewType === 'outbound' && (
-            <button
-              onClick={() => onViewChange('return')}
-              className="fixed right-4 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all z-50"
+              <button
+                  onClick={handleReturnClick}
+                  className={`${slideIn ? "slide_in" : ""} ${slideOut ? "slide_out_to_right" : ""} flex flex-col gap-2 items-center text-[.5em] font-bold fixed right-4 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all z-50`}
               aria-label="View Return Flights"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
+                Return Flights
+
             </button>
           )}
         </>
@@ -263,7 +309,8 @@ export async function FlightSearch({ from, to, tripType, departDate, returnDate,
     return_date: returnDate,
     currency: "USD",
     format: "json",
-    type: roundTrip
+    type: roundTrip,
+    travel_class: cabinClass
   }
   });
 
