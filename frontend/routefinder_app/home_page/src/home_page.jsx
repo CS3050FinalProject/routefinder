@@ -180,7 +180,7 @@ export default function SearchBar() {
                   <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
                     <input
                     type="text"
-                    value={from}
+                    value={from.toUpperCase()}
                     onChange={(e) => handleFromChange(e.target.value)}
                     onFocus={() => {
                       if (from) {
@@ -256,7 +256,7 @@ export default function SearchBar() {
                   <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
                     <input
                       type="text"
-                      value={to}
+                      value={to.toUpperCase()}
                       onChange={(e) => handleToChange(e.target.value)}
                       onFocus={() => {
                         if (to) {
