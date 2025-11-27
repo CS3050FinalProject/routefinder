@@ -1,6 +1,4 @@
 import React, { useState} from 'react';
-import { Plane, TrainFront, BusFront, Rat } from 'lucide-react';
-import RoutefinderLogo from './images/Logo.svg';
 import axios from 'axios';
 
 
@@ -17,7 +15,6 @@ const isValidateText = (value) => {
 const RouteCard = ({ companyLogo, company, cost, time, layovers, showRoutes }) => {
     const [expanded, setExpanded] = useState(false);
     const Chevron = expanded ? "▲" : "▼";
-    let IconComponent;
 
     const hours = Math.floor(time / 60);
     const minutes = time % 60;
@@ -38,9 +35,9 @@ const RouteCard = ({ companyLogo, company, cost, time, layovers, showRoutes }) =
                 <div className="text-xs text-gray-500 mb-1">Duration</div>
                 <div className="font-medium text-gray-700">
                     {time % 60 !== 0 ? (
-                        <p className="font-medium">{parseInt(time / 60)} hours and {time % 60} minutes</p>
+                        <p className="font-medium">{parseInt(hours)} hours and {minutes} minutes</p>
                     ) : (
-                        <p className="font-medium">{parseInt(time / 60)} hours</p>
+                        <p className="font-medium">{parseInt(hours)} hours</p>
                     )}
                 </div>
             </div>
@@ -163,7 +160,7 @@ export function FlightResults({ routes, showRoutes, loading }) {
 }
 
 // Function to perform search
-export async function performFlightSearch({ from, to, tripType, departDate, returnDate, cabinClass }) {
+export async function FlightSearch({ from, to, tripType, departDate, returnDate, cabinClass }) {
   // Extract airport codes from formatted strings like "New York (JFK)"
   const extractCode = (text) => {
     const match = text.match(/\(([A-Z]{3})\)/);
@@ -234,7 +231,6 @@ export async function performFlightSearch({ from, to, tripType, departDate, retu
     routes.push({
       id: i,
       companyLogo: trip.flights[0].airline_logo,
-      vehicleType: "Plane",
       time: total_time,
       company: trip.flights[0].airline_name,
       cost: trip.price,

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, ArrowLeftRight } from 'lucide-react';
 import airportsData from './airports.json';
-import { performFlightSearch, FlightResults } from './Results';
+import { FlightSearch, FlightResults } from './Results';
 import {Dropdown, DropdownButton} from 'react-bootstrap';
 import bannerImage from './images/DC3.webp';
 
@@ -92,7 +92,7 @@ export default function SearchBar() {
     setShowRoutes(false);
 
      try {
-      const searchResults = await performFlightSearch({
+      const searchResults = await FlightSearch({
         from,
         to,
         tripType,
@@ -341,7 +341,7 @@ export default function SearchBar() {
 
                 {/* Search Button */}
                 <button
-                  style={{ borderRadius: '10px' }}
+                  style={{ borderRadius: '8px' }}
                   onClick={handleSearch}
                   className="bg-orange-600 hover:bg-orange-700 px-8 flex items-center justify-center transition-colors"
                 >
