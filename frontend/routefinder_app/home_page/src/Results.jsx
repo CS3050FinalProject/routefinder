@@ -130,7 +130,15 @@ const RouteCard = ({ companyLogo, company, cost, time, layovers, departDate, dep
                   Layover time: {parseInt(total_time / 60)} hours and {total_time % 60} minutes
                 </li>
                 );
-              } else {
+              }
+              else if (parseInt(total_time / 60) === 0) {
+               layover_segments.push(
+                <li key={`time-${i}`}>
+                  Layover time: {total_time % 60} minutes
+                </li>
+                );
+              }
+              else {
                 layover_segments.push(
                 <li key={`time-${i}`}>
                   Layover time: {parseInt(total_time / 60)} hours
@@ -313,7 +321,8 @@ export async function FlightSearch({ from, to, tripType, departDate, returnDate,
     travel_class: cabinClass
   }
   });
-
+  console.log('cabinClass:', cabinClass);
+  console.log('response travelClass:', response.data.outbound_trips[0].travel_class);
   console.log('Raw response:', response.data);
   const responses = response.data;
 
