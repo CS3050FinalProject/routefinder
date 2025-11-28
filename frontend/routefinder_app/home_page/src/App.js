@@ -1,9 +1,9 @@
 import logo from './logo.svg';
 import './App.css';
-import AirportRoutes from "./home_page.jsx";
+import SearchBar from "./home_page.jsx";
 
 function App() {
-  return <AirportRoutes />;
+  return <SearchBar />;
 }
 export default App;
 
