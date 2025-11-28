@@ -15,9 +15,16 @@ export default function SearchBar() {
   const [tripType, setTripType] = useState('roundtrip');
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
-  const [departDate, setDepartDate] = useState('');
-  const [returnDate, setReturnDate] = useState('');
-  const [cabinClass, setCabinClass] = useState('economy');
+  //Sets the depart day to the current day
+  const current = new Date();
+  const [departDate, setDepartDate] = useState(`${current.getFullYear()}-${current.getMonth()+1}-${current.getDate()}`);
+  const [returnDate, setReturnDate] = useState(() => {
+    // Sets the return date to 3 days later
+  const d = new Date();
+  d.setDate(d.getDate() + 3);
+  return d.toISOString().slice(0, 10);
+});
+  const [cabinClass, setCabinClass] = useState('1');
   
   const [fromSuggestions, setFromSuggestions] = useState([]);
   const [toSuggestions, setToSuggestions] = useState([]);
@@ -156,18 +163,18 @@ export default function SearchBar() {
                 <DropdownButton
                   id="cabin-class-dropdown"
                   title={
-                    cabinClass === 'economy' ? 'Economy' :
-                    cabinClass === 'premium' ? 'Premium Economy' :
-                    cabinClass === 'business' ? 'Business' :
+                    cabinClass === '1' ? 'Economy' :
+                    cabinClass === '2' ? 'Premium Economy' :
+                    cabinClass === '3' ? 'Business' :
                     'First Class'
                   }
                   variant="light"
                   onSelect={(value) => setCabinClass(value)}
                 >
-                  <Dropdown.Item eventKey="economy">Economy</Dropdown.Item>
-                  <Dropdown.Item eventKey="premium">Premium Economy</Dropdown.Item>
-                  <Dropdown.Item eventKey="business">Business</Dropdown.Item>
-                  <Dropdown.Item eventKey="first">First Class</Dropdown.Item>
+                  <Dropdown.Item eventKey="1">Economy</Dropdown.Item>
+                  <Dropdown.Item eventKey="2">Premium Economy</Dropdown.Item>
+                  <Dropdown.Item eventKey="3">Business</Dropdown.Item>
+                  <Dropdown.Item eventKey="4">First Class</Dropdown.Item>
                 </DropdownButton>
               </div>
             </div>
