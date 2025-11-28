@@ -28,7 +28,7 @@ class FlightSearchView(APIView):
     Must set SERPAPI_API_KEY in environment.
     """
     SERPAPI_URL = "https://serpapi.com/search.json"
-    ALLOWED_PARAMS = {"departure_id", "arrival_id", "outbound_date", "return_date", "currency", "type"}
+    ALLOWED_PARAMS = {"departure_id", "arrival_id", "outbound_date", "return_date", "currency", "type", "travel_class"}
     REQUIRED_PARAMS = {"departure_id", "arrival_id", "outbound_date"}
 
     def get(self, request):
@@ -59,7 +59,7 @@ class FlightSearchView(APIView):
                 params[k] = v
 
 
-        # TODO: Implement logic to check if user is searching for direct or
+        # Implement logic to check if user is searching for direct or
         # round trip flights. Filter out potentially unnecessary parameters.
 
         # Return an error if required parameters are missing
@@ -108,12 +108,14 @@ class FlightSearchView(APIView):
         # generate unique search ID for outbound flight
         search_id = generate_unique_search_id(params.get("departure_id"),
                                               params.get("arrival_id"),
-                                              params.get("outbound_date"))
+                                              params.get("outbound_date"),
+                                              params.get("travel_class"))
         if is_round_trip:
             # generate unique search ID for return flight
             return_search_id = generate_unique_search_id(params.get("arrival_id"),
                                                          params.get("departure_id"),
-                                                         params.get("return_date"))
+                                                         params.get("return_date"),
+                                                         params.get("travel_class"))
         
         print(">>> search_id generated <<<")
 

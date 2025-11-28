@@ -37,9 +37,10 @@ def save_flights(data, batch_size: int=10) -> dict:
 def generate_unique_search_id(
         departure_id: str,
         arrival_id: str,
-        outbound_date: str) -> str:
+        outbound_date: str,
+        travel_class: str) -> str:
     '''Generates a unique search ID based on flight search parameters.'''
-    unique_string = f"{departure_id}-{arrival_id}-{outbound_date}"
+    unique_string = f"{departure_id}-{arrival_id}-{outbound_date}-{travel_class}"
     return hashlib.md5(unique_string.encode()).hexdigest()
 
 def generate_unique_trip_id(full_trip_str: str) -> str:
