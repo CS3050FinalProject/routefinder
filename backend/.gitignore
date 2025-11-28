@@ -1,0 +1,8 @@
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+*.zip
+
+# Serp Json Files
+# *Serp*.json
