@@ -40,11 +40,11 @@ class FlightSearchView(APIView):
         """
         print(">>> views debugging <<<")
         # Clean database of old searches
-        # try:
-        #     management.call_command('db_sweeper')
-        #     print("db_sweeper executed")
-        # except Exception as e:
-        #     print("db_sweeper skipped:", e)
+        try:
+            management.call_command('db_sweeper')
+            print("db_sweeper executed")
+        except Exception as e:
+            print("db_sweeper skipped:", e)
 
         # Check for api key
         api_key = os.environ.get("SERP_API_KEY") # api key in eb environment
