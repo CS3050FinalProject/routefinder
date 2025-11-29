@@ -20,9 +20,9 @@ export default function SearchBar() {
   const [departDate, setDepartDate] = useState(`${current.getFullYear()}-${current.getMonth()+1}-${current.getDate()}`);
   const [returnDate, setReturnDate] = useState(() => {
     // Sets the return date to 3 days later
-  const d = new Date();
-  d.setDate(d.getDate() + 3);
-  return d.toISOString().slice(0, 10);
+  const threeDaysInFuture = new Date();
+  threeDaysInFuture.setDate(current.getDate() + 3);
+  return threeDaysInFuture.toISOString().slice(0, 10);
 });
   const [cabinClass, setCabinClass] = useState('1');
   
@@ -322,6 +322,7 @@ export default function SearchBar() {
                   <input
                     type="date"
                     value={departDate}
+                    min ={new Date().toISOString().slice(0, 10)}
                     onChange={(e) => setDepartDate(e.target.value)}
                     className="w-full text-lg font-medium outline-none text-gray-800 cursor-pointer"
                     style={{ colorScheme: 'light' }}
@@ -340,6 +341,7 @@ export default function SearchBar() {
                       <input
                         type="date"
                         value={returnDate}
+                        min={departDate}
                         onChange={(e) => setReturnDate(e.target.value)}
                         className="w-full text-lg font-medium outline-none text-gray-800 cursor-pointer"
                         style={{ colorScheme: 'light' }}
