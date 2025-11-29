@@ -14,7 +14,7 @@ def get_test(endpoint):
         "type": 2,
         "outbound_date": "2025-12-19",
         #"return_date": "2025-12-19",
-        #"travel_class": 1,
+        "travel_class": 1,
         #"exclude_basic": False,
         "currency": "USD",
     })
@@ -23,7 +23,7 @@ def get_test(endpoint):
 
 
 if __name__ == "__main__":
-    endpoint = "http://routefinder-api-env-prod.eba-egdm2f3j.us-east-1.elasticbeanstalk.com/flights/search/"
+    endpoint = "https://routefinder-https-env.us-east-1.elasticbeanstalk.com/flights/search/"
     #endpoint = 'http://0.0.0.0:8000/flights/search'
     #post_test(endpoint)
     get_test(endpoint)
