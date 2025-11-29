@@ -155,7 +155,7 @@ def search_for_flights(self, params: dict, search_id: str):
 
     # make request to SerpAPI if not existing search and save to database
     if not existing_search:
-        get_flights_from_serpapi(self.SERPAPI_url, params, search_id)
+        get_flights_from_serpapi(self.SERPAPI_URL, params, search_id)
 
     # Retrieve saved flights from database
     try:
