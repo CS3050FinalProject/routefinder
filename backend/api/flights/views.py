@@ -2,20 +2,13 @@
 Flight views.
 """
 import os
-from asyncio.log import logger
 import json
 
-import requests
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from django.core import serializers
 from django.core import management
 
-from .models import Flight
-from .serializers import FlightSerializer
-from api.searches.serializers import SearchSerializer
-from api.searches.models import Search
 from .services import generate_unique_search_id, search_for_flights
 
 
@@ -28,7 +21,8 @@ class FlightSearchView(APIView):
     Must set SERPAPI_API_KEY in environment.
     """
     SERPAPI_URL = "https://serpapi.com/search.json"
-    ALLOWED_PARAMS = {"departure_id", "arrival_id", "outbound_date", "return_date", "currency", "type", "travel_class"}
+    ALLOWED_PARAMS = {"departure_id", "arrival_id", "outbound_date", "return_date",
+                    "currency", "type", "travel_class"}
     REQUIRED_PARAMS = {"departure_id", "arrival_id", "outbound_date"}
 
     def get(self, request):
@@ -43,7 +37,7 @@ class FlightSearchView(APIView):
         try:
             management.call_command('db_sweeper')
             print("db_sweeper executed")
-        except Exception as e:
+        except (KeyError, ValueError, RuntimeError) as e:
             print("db_sweeper skipped:", e)
 
         # Check for api key
@@ -67,34 +61,31 @@ class FlightSearchView(APIView):
             cp_required = self.REQUIRED_PARAMS.copy()
             cp_required -= set(params)
             return Response({"error": f"Missing params: {cp_required}"},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+                            status=status.HTTP_400_BAD_REQUEST)
+
         print(">>> Setting trip type <<<")
         # Check for user specified flight type and filter passed parameters accordingly
         # 1 - Round trip (default)
         # 2 - One way
-        if "type" in params.keys():
+        if "type" in params:
             trip_type = int(params.get("type"))
         else:
             trip_type = 1  # Default to round trip
 
         match trip_type:
             case 1:
-                if params.get("return_date") == None:
+                if params.get("return_date") is None:
                     return Response({"error": "No return date specified for round trip search."},
-                                   status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                                   status=status.HTTP_400_BAD_REQUEST)
             case 2:
-                if params.get("return_date") != None:
+                if params.get("return_date") is not None:
                     del params["return_date"]
             case _:
                 return Response({"error": "Invalid flight type passed."},
-                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            
+                                status=status.HTTP_400_BAD_REQUEST)
+
         #Set boolean for round trip
-        if trip_type == 1:
-            is_round_trip = True
-        else:   
-            is_round_trip = False
+        is_round_trip = bool(trip_type == 1)
 
         # generate unique search ID for outbound flight
         search_id = generate_unique_search_id(params.get("departure_id"),
@@ -107,7 +98,7 @@ class FlightSearchView(APIView):
                                                          params.get("departure_id"),
                                                          params.get("return_date"),
                                                          params.get("travel_class"))
-        
+
         print(">>> search_id generated <<<")
 
         # enforce engine and api_key
