@@ -93,6 +93,8 @@ export default function SearchBar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+
+
   async function handleSearch() {
     console.log({ tripType, from, to, departDate, returnDate, cabinClass });
     // Implement search functionality here
@@ -323,7 +325,14 @@ export default function SearchBar() {
                     type="date"
                     value={departDate}
                     min ={new Date().toISOString().slice(0, 10)}
-                    onChange={(e) => setDepartDate(e.target.value)}
+                    onChange={(e) => {
+                      setDepartDate(e.target.value);
+                      if ((returnDate <= departDate) && (tripType === 'roundtrip')) {
+                          const newReturn = new Date(e.target.value);
+                          newReturn.setDate(newReturn.getDate() + 3);
+                          setReturnDate(newReturn.toISOString().slice(0, 10));
+                      }
+                  }}
                     className="w-full text-lg font-medium outline-none text-gray-800 cursor-pointer"
                     style={{ colorScheme: 'light' }}
                   />
