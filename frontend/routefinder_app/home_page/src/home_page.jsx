@@ -96,7 +96,7 @@ export default function SearchBar() {
 
 
   async function handleSearch() {
-    console.log({ tripType, from, to, departDate, returnDate, cabinClass });
+    
     // Implement search functionality here
     setLoading(true);
     setShowRoutes(false);
@@ -115,7 +115,6 @@ export default function SearchBar() {
       setRoutes(searchResults);
       setTimeout(() => setShowRoutes(true), 100);
     } catch (error) {
-      console.error('Search failed:', error);
       alert(error.message || 'Failed to fetch flight data. Please try again.');
       setRoutes({ outbound: [], return: [] });
     } finally {
