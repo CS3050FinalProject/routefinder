@@ -130,7 +130,15 @@ const RouteCard = ({ companyLogo, company, cost, time, layovers, departDate, dep
                   Layover time: {parseInt(total_time / 60)} hours and {total_time % 60} minutes
                 </li>
                 );
-              } else {
+              }
+              else if (parseInt(total_time / 60) === 0) {
+               layover_segments.push(
+                <li key={`time-${i}`}>
+                  Layover time: {total_time % 60} minutes
+                </li>
+                );
+              }
+              else {
                 layover_segments.push(
                 <li key={`time-${i}`}>
                   Layover time: {parseInt(total_time / 60)} hours
@@ -290,6 +298,11 @@ export async function FlightSearch({ from, to, tripType, departDate, returnDate,
   throw new Error('Your destination airport should only be letters. For example: "IAD" or "SFO"');
   }
 
+  if (tripType === 'roundtrip') {
+    if (!returnDate) throw new Error('Please select a return date for round trips.');
+    if (returnDate <= departDate) throw new Error('Your return date should be after your departure date.');
+  }
+
   if (!origin || !destination) {
   throw new Error("Please enter both origin and destination airports.");
   }
@@ -313,7 +326,8 @@ export async function FlightSearch({ from, to, tripType, departDate, returnDate,
     travel_class: cabinClass
   }
   });
-
+  console.log('cabinClass:', cabinClass);
+  console.log('response travelClass:', response.data.outbound_trips[0].travel_class);
   console.log('Raw response:', response.data);
   const responses = response.data;
 
