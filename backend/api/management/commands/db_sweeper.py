@@ -2,12 +2,16 @@
 Python script for cleaning database of old searches and flights.
 old: object created >= 1 hour ago
 """
-from django.utils import timezone
-from api.searches.models import Search
-from django.core.management.base import BaseCommand
 from datetime import timedelta
 
+from django.utils import timezone
+from django.core.management.base import BaseCommand
+
+from api.searches.models import Search
+
+
 class Command(BaseCommand):
+    """Django management command to delete old search records."""
     help = 'Deletes searches and related flights older than one hour'
 
     def handle(self, *args, **kwargs):
@@ -18,5 +22,4 @@ class Command(BaseCommand):
         count, _ = old_searches.delete()
 
         self.stdout.write(self.style.SUCCESS(f'Deleted {count} old searches and related flights'))
-
 
