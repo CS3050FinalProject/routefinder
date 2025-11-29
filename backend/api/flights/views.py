@@ -78,15 +78,6 @@ class FlightSearchView(APIView):
         else:
             trip_type = 1  # Default to round trip
 
-        """
-        NOTE: We may want to move logic for querying serpapi inside
-        this match-case statement to avoid using a large if else statement
-        checking the trip type later in the code. Alternatively we can move
-        the code to query serpapi to a function in the services file the way
-        we did with the code to parse the json. We may want to do that regardless
-        to avoid duplicating the query code for return flights since we will need
-        to make two queries to serp.
-        """
         match trip_type:
             case 1:
                 if params.get("return_date") == None:
