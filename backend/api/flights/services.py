@@ -1,4 +1,5 @@
-'''Flight services.
+'''
+Flight services
 '''
 from asyncio.log import logger
 import json
@@ -48,6 +49,7 @@ def generate_unique_trip_id(full_trip_str: str) -> str:
     return hashlib.md5(full_trip_str.encode()).hexdigest()
 
 def parse_flights_json(flights_list: list, search_id: str) -> Optional[list]:
+    '''Parse the json returned by SERPAPI for flight information.'''
     #print(flights_list)
     flights_to_save = []
     for itinerary in flights_list:
@@ -91,6 +93,7 @@ def parse_flights_json(flights_list: list, search_id: str) -> Optional[list]:
     return None if not flights_to_save else flights_to_save
 
 def get_flights_from_serpapi(URL, params: dict, search_id: str):
+    '''Query SERPAPI for flight information according to user search.'''
     try:
         r = requests.get(URL, params=params, timeout=15)
         r.raise_for_status()
@@ -137,8 +140,9 @@ def get_flights_from_serpapi(URL, params: dict, search_id: str):
         return Response({"error": "SerpAPI returned non-JSON",
                             "text": r.text[:200]},
                             status=status.HTTP_502_BAD_GATEWAY)
-    
+
 def search_for_flights(self, params: dict, search_id: str):
+    '''Check database for previous searches that match current search.'''
     # Search Database for existing searches
     print(">>> Checking for previous matching searches <<<")
     existing_search = Search.objects.filter(search_id=search_id).first()
