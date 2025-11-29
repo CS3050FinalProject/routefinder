@@ -65,14 +65,14 @@ class FlightSerializer(serializers.ModelSerializer):
         print("--- end serializers debugging ---")
         return {"created": len(created_objs), "created_objs": created_objs}
 
-
-    def get_flights_by_search_id(self, search_id: str, limit=15) -> list[dict]:
+    @staticmethod
+    def get_flights_by_search_id(search_id: str, limit=15):
         '''Retrieve flights by search_id. Returns a list of flight dicts.'''
         # If found, return existing search data (fetch flights from DB)
         flights = Flight.objects.filter(search_id=search_id)
 
         if not flights:
-            raise Exception("No flights found for given search_id.")
+            raise ValueError("No flights found for given search_id.")
 
         unique_trip_ids = []
         flights_list = []

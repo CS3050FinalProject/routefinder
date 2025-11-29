@@ -141,6 +141,8 @@ def get_flights_from_serpapi(url, params: dict, search_id: str):
                             "text": r.text[:200]},
                             status=status.HTTP_502_BAD_GATEWAY)
 
+    return None
+
 def search_for_flights(self, params: dict, search_id: str):
     '''Check database for previous searches that match current search.'''
     # Search Database for existing searches
@@ -154,14 +156,14 @@ def search_for_flights(self, params: dict, search_id: str):
     # make request to SerpAPI if not existing search and save to database
     if not existing_search:
         get_flights_from_serpapi(self.SERPAPI_url, params, search_id)
- 
+
     # Retrieve saved flights from database
     try:
         get_flights_by_search_id = FlightSerializer.get_flights_by_search_id(search_id)
-    except Exception as e:
+    except ValueError as e:
         print(e)
-        return requests.Response({"error": "There are no saved flights for this search"},
-                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # Return empty list if no flights found
+        return []
 
     # group flights by trip_id into trips, preserving insertion order
     trips_map = {}

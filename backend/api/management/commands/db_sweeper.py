@@ -22,4 +22,3 @@ class Command(BaseCommand):
         count, _ = old_searches.delete()
 
         self.stdout.write(self.style.SUCCESS(f'Deleted {count} old searches and related flights'))
-
