@@ -119,11 +119,8 @@ const RouteCard = ({ companyLogo, company, cost, time, layovers, departDate, dep
               const arrival_time = layovers[i-1].arrival_time;
               const departure_time = layovers[i ].departure_time;
               const [arrival_hours, arrival_minutes] = arrival_time.split(':').map(Number);
-              console.log(arrival_hours, arrival_minutes)
               const [departure_hours, departure_minutes] = departure_time.split(':').map(Number);
-              console.log(departure_hours, departure_minutes)
               const total_time = Math.abs((arrival_hours * 60 + arrival_minutes) -(departure_hours * 60 + departure_minutes));
-              console.log('totaltime;',total_time)
               if (total_time % 60 !== 0) {
                 layover_segments.push(
                 <li key={`time-${i}`}>
@@ -326,16 +323,11 @@ export async function FlightSearch({ from, to, tripType, departDate, returnDate,
     travel_class: cabinClass
   }
   });
-  console.log('cabinClass:', cabinClass);
-  console.log('response travelClass:', response.data.outbound_trips[0].travel_class);
-  console.log('Raw response:', response.data);
   const responses = response.data;
 
   if (!responses || !responses.outbound_trips) {
   throw new Error("Invalid response from server");
   }
-
-  console.log('Number of outbound trips:', responses.outbound_trips.length);
 
   const processTrips = (trips) => {
     const routes = [];
@@ -378,7 +370,6 @@ export async function FlightSearch({ from, to, tripType, departDate, returnDate,
   let returnRoutes = [];
 
   if (roundTrip === 1 && responses.return_trips) {
-    console.log('Number of return trips:', responses.return_trips.length);
     returnRoutes = processTrips(responses.return_trips);
   }
 
