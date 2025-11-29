@@ -298,6 +298,11 @@ export async function FlightSearch({ from, to, tripType, departDate, returnDate,
   throw new Error('Your destination airport should only be letters. For example: "IAD" or "SFO"');
   }
 
+  if (tripType === 'roundtrip') {
+    if (!returnDate) throw new Error('Please select a return date for round trips.');
+    if (returnDate <= departDate) throw new Error('Your return date should be after your departure date.');
+  }
+
   if (!origin || !destination) {
   throw new Error("Please enter both origin and destination airports.");
   }
