@@ -92,10 +92,10 @@ def parse_flights_json(flights_list: list, search_id: str) -> Optional[list]:
 
     return None if not flights_to_save else flights_to_save
 
-def get_flights_from_serpapi(URL, params: dict, search_id: str):
+def get_flights_from_serpapi(url, params: dict, search_id: str):
     '''Query SERPAPI for flight information according to user search.'''
     try:
-        r = requests.get(URL, params=params, timeout=15)
+        r = requests.get(url, params=params, timeout=15)
         r.raise_for_status()
         print(">>> SerpAPI request successful")
         # If not found, create a new Search entry
@@ -153,8 +153,8 @@ def search_for_flights(self, params: dict, search_id: str):
 
     # make request to SerpAPI if not existing search and save to database
     if not existing_search:
-        get_flights_from_serpapi(self.SERPAPI_URL, params, search_id)
-    
+        get_flights_from_serpapi(self.SERPAPI_url, params, search_id)
+ 
     # Retrieve saved flights from database
     try:
         get_flights_by_search_id = FlightSerializer.get_flights_by_search_id(search_id)
