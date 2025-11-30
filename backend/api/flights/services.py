@@ -1,4 +1,5 @@
-'''Flight services.
+'''
+Flight services
 '''
 from asyncio.log import logger
 import json
@@ -48,6 +49,7 @@ def generate_unique_trip_id(full_trip_str: str) -> str:
     return hashlib.md5(full_trip_str.encode()).hexdigest()
 
 def parse_flights_json(flights_list: list, search_id: str) -> Optional[list]:
+    '''Parse the json returned by SERPAPI for flight information.'''
     #print(flights_list)
     flights_to_save = []
     for itinerary in flights_list:
@@ -90,9 +92,10 @@ def parse_flights_json(flights_list: list, search_id: str) -> Optional[list]:
 
     return None if not flights_to_save else flights_to_save
 
-def get_flights_from_serpapi(URL, params: dict, search_id: str):
+def get_flights_from_serpapi(url, params: dict, search_id: str):
+    '''Query SERPAPI for flight information according to user search.'''
     try:
-        r = requests.get(URL, params=params, timeout=15)
+        r = requests.get(url, params=params, timeout=15)
         r.raise_for_status()
         print(">>> SerpAPI request successful")
         # If not found, create a new Search entry
@@ -137,8 +140,11 @@ def get_flights_from_serpapi(URL, params: dict, search_id: str):
         return Response({"error": "SerpAPI returned non-JSON",
                             "text": r.text[:200]},
                             status=status.HTTP_502_BAD_GATEWAY)
-    
+
+    return None
+
 def search_for_flights(self, params: dict, search_id: str):
+    '''Check database for previous searches that match current search.'''
     # Search Database for existing searches
     print(">>> Checking for previous matching searches <<<")
     existing_search = Search.objects.filter(search_id=search_id).first()
@@ -150,14 +156,14 @@ def search_for_flights(self, params: dict, search_id: str):
     # make request to SerpAPI if not existing search and save to database
     if not existing_search:
         get_flights_from_serpapi(self.SERPAPI_URL, params, search_id)
-    
+
     # Retrieve saved flights from database
     try:
         get_flights_by_search_id = FlightSerializer.get_flights_by_search_id(search_id)
-    except Exception as e:
+    except ValueError as e:
         print(e)
-        return requests.Response({"error": "There are no saved flights for this search"},
-                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # Return empty list if no flights found
+        return []
 
     # group flights by trip_id into trips, preserving insertion order
     trips_map = {}

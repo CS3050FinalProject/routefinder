@@ -3,7 +3,6 @@ Flight serializers.
 '''
 import json
 
-from requests import Response
 from rest_framework import serializers
 from django.db import transaction, IntegrityError, DatabaseError
 
@@ -62,20 +61,18 @@ class FlightSerializer(serializers.ModelSerializer):
             print("--- Database integrity error during bulk_create:", e)
         except DatabaseError as e:
             print("--- General database error during bulk_create:", e)
-        except Exception as e:
-            print("--- Unexpected error while saving flights:", e)
 
         print("--- end serializers debugging ---")
         return {"created": len(created_objs), "created_objs": created_objs}
 
-
-    def get_flights_by_search_id(search_id: str, limit=15) -> list[dict]:
+    @staticmethod
+    def get_flights_by_search_id(search_id: str, limit=15):
         '''Retrieve flights by search_id. Returns a list of flight dicts.'''
         # If found, return existing search data (fetch flights from DB)
         flights = Flight.objects.filter(search_id=search_id)
 
         if not flights:
-            raise Exception("No flights found for given search_id.")
+            raise ValueError("No flights found for given search_id.")
 
         unique_trip_ids = []
         flights_list = []
@@ -107,4 +104,3 @@ class FlightSerializer(serializers.ModelSerializer):
             flights_list.append(flight_dict)
 
         return flights_list
-

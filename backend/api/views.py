@@ -29,16 +29,16 @@ def api_home(request, *args, **kwargs):
         serializer = FlightSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             return Response(serializer.data)
+        return Response({"error": "Invalid data"}, status=400)
 
-    elif request.method == "GET":
+    if request.method == "GET":
         flights = Flight.objects.all()
         serializer = FlightSerializer(flights, many=True)
         json_data = serializer.data
         return Response(json_data)
 
-    else:
-        response = {"error": "bad request"}
-        return Response(response)
+    response = {"error": "bad request"}
+    return Response(response)
 
 
 def db_health_check(request):
